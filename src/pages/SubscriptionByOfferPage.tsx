@@ -9,7 +9,7 @@
  *   followed by a list of duration options with savings and price CTAs.
  */
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import type { SubscriptionPeriod } from '@sudobility/types';
 import {
   useAllOfferings,
@@ -136,6 +136,14 @@ export function SubscriptionByOfferPage({
   const [selectedSegment, setSelectedSegment] = useState<string>(
     initialOfferId ?? 'free'
   );
+
+  // Sync selectedSegment when initialOfferId changes (e.g. switching techniques)
+  useEffect(() => {
+    if (initialOfferId) {
+      setSelectedSegment(initialOfferId);
+    }
+  }, [initialOfferId]);
+
   const [purchaseError, setPurchaseError] = useState<string | null>(null);
   const [isPurchasing, setIsPurchasing] = useState(false);
 
