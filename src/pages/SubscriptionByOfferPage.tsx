@@ -3,6 +3,8 @@
  *
  * Subscription page that organizes packages by offering.
  * Uses a SegmentedControl to switch between offerings (with a 'Free' option).
+ * Packages within each offer are sorted by duration (short to long).
+ * Savings are calculated relative to the shortest duration package.
  */
 
 import { useState } from 'react';
@@ -12,6 +14,7 @@ import {
   useUserSubscription,
   getSubscriptionInstance,
   refreshSubscription,
+  periodToMonths,
 } from '@sudobility/subscription_lib';
 import type { SubscriptionPackage } from '@sudobility/subscription_lib';
 import {
@@ -19,7 +22,10 @@ import {
   SubscriptionTile,
   SegmentedControl,
 } from '@sudobility/subscription-components';
-import type { FreeTileConfig } from '@sudobility/subscription-components';
+import type {
+  FreeTileConfig,
+  DiscountBadgeConfig,
+} from '@sudobility/subscription-components';
 
 export interface SubscriptionByOfferPageProps {
   /** Whether the user is logged in */
@@ -38,6 +44,41 @@ export interface SubscriptionByOfferPageProps {
   title?: string;
   /** Additional CSS classes */
   className?: string;
+  /**
+   * Translation function for localizing offer names and labels.
+   * Keys passed: offer identifiers (e.g. "basic", "premium"), "free".
+   * Falls back to the fallback string if not provided.
+   */
+  t?: (key: string, fallback: string) => string;
+}
+
+/**
+ * Calculate savings percentage of a package relative to a base (shortest) package.
+ * Compares the monthly cost of each.
+ */
+function calcSavingsPercent(
+  basePkg: SubscriptionPackage,
+  pkg: SubscriptionPackage
+): number | null {
+  if (!basePkg.product || !pkg.product) return null;
+
+  const baseMonths = periodToMonths(basePkg.product.period);
+  const pkgMonths = periodToMonths(pkg.product.period);
+
+  if (baseMonths <= 0 || pkgMonths <= 0) return null;
+  if (baseMonths === Infinity || pkgMonths === Infinity) return null;
+  // Same duration - no savings to show
+  if (baseMonths === pkgMonths) return null;
+
+  const baseMonthlyCost = basePkg.product.price / baseMonths;
+  const pkgMonthlyCost = pkg.product.price / pkgMonths;
+
+  if (baseMonthlyCost <= 0) return null;
+
+  const savings = Math.round(
+    ((baseMonthlyCost - pkgMonthlyCost) / baseMonthlyCost) * 100
+  );
+  return savings > 0 ? savings : null;
 }
 
 export function SubscriptionByOfferPage({
@@ -49,7 +90,11 @@ export function SubscriptionByOfferPage({
   freeFeatures,
   title = 'Choose Your Plan',
   className,
+  t: translate,
 }: SubscriptionByOfferPageProps) {
+  const loc = (key: string, fallback: string) =>
+    translate ? translate(key, fallback) : fallback;
+
   const {
     offerings,
     isLoading: isLoadingOfferings,
@@ -101,18 +146,23 @@ export function SubscriptionByOfferPage({
     }
   };
 
+  // Build segment options: Free + each offering (localized labels)
   const segmentOptions = [
-    { value: 'free', label: 'Free' },
+    { value: 'free', label: loc('free', 'Free') },
     ...offerings.map((o) => ({
       value: o.offerId,
-      label: o.offerId,
+      label: loc(o.offerId, o.offerId.charAt(0).toUpperCase() + o.offerId.slice(1)),
     })),
   ];
+
+  // Shortest-duration package is the base for savings comparison
+  // (packages are already sorted short→long by useOfferingPackages)
+  const basePkg = packages[0] ?? null;
 
   const getFreeTileConfig = (): FreeTileConfig | undefined => {
     if (!isLoggedIn) {
       return {
-        title: 'Free',
+        title: loc('free', 'Free'),
         price: '$0',
         features: freeFeatures ?? [],
         ctaButton: {
@@ -126,7 +176,7 @@ export function SubscriptionByOfferPage({
 
     if (!hasSubscription) {
       return {
-        title: 'Free',
+        title: loc('free', 'Free'),
         price: '$0',
         features: freeFeatures ?? [],
         ctaButton: {
@@ -137,7 +187,7 @@ export function SubscriptionByOfferPage({
     }
 
     return {
-      title: 'Free',
+      title: loc('free', 'Free'),
       price: '$0',
       features: freeFeatures ?? [],
       ctaButton: {
@@ -237,11 +287,13 @@ export function SubscriptionByOfferPage({
       freeTileConfig={isFreeSelected ? getFreeTileConfig() : undefined}
       aboveProducts={
         segmentOptions.length > 1 ? (
-          <SegmentedControl
-            options={segmentOptions}
-            value={selectedSegment}
-            onChange={setSelectedSegment}
-          />
+          <div className="flex justify-center">
+            <SegmentedControl
+              options={segmentOptions}
+              value={selectedSegment}
+              onChange={setSelectedSegment}
+            />
+          </div>
         ) : undefined
       }
     >
@@ -252,6 +304,18 @@ export function SubscriptionByOfferPage({
             subscription?.isActive &&
             subscription.packageId === pkg.packageId;
           const cta = getPaidTileCta(pkg, selectedSegment);
+
+          // Calculate savings badge relative to shortest duration
+          let discountBadge: DiscountBadgeConfig | undefined;
+          if (basePkg && pkg.packageId !== basePkg.packageId) {
+            const savings = calcSavingsPercent(basePkg, pkg);
+            if (savings !== null) {
+              discountBadge = {
+                text: `Save ${savings}%`,
+                isBestValue: pkg === packages[packages.length - 1],
+              };
+            }
+          }
 
           return (
             <SubscriptionTile
@@ -268,6 +332,7 @@ export function SubscriptionByOfferPage({
               isCurrentPlan={isCurrentPlan}
               ctaButton={cta}
               disabled={isPurchasing}
+              discountBadge={discountBadge}
             />
           );
         })}
