@@ -341,10 +341,13 @@ export function SubscriptionByOfferPage({
                       : 'bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700')
                   }
                 >
-                  {/* Left: duration title + savings subtitle */}
+                  {/* Left: duration title + package id + savings subtitle */}
                   <div className="min-w-0 flex-1">
                     <p className="text-base font-semibold text-gray-900 dark:text-gray-100">
                       {periodLabel}
+                    </p>
+                    <p className="text-xs text-gray-400 dark:text-gray-500">
+                      {pkg.packageId}
                     </p>
                     {savings !== null ? (
                       <p className="text-sm font-medium text-green-600 dark:text-green-400">
