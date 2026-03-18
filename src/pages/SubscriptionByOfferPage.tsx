@@ -56,6 +56,11 @@ export interface SubscriptionByOfferPageProps {
    * Return a list of strings or React elements shown in a styled container.
    */
   renderOfferingContent?: (offerId: string) => React.ReactNode;
+  /**
+   * If set, automatically select the specified offering on mount.
+   * Must match an offering identifier from RevenueCat.
+   */
+  initialOfferId?: string;
 }
 
 /** Capitalize first letter fallback */
@@ -111,6 +116,7 @@ export function SubscriptionByOfferPage({
   className,
   t: translate,
   renderOfferingContent,
+  initialOfferId,
 }: SubscriptionByOfferPageProps) {
   const loc = (key: string, fallback: string) =>
     translate ? translate(key, fallback) : fallback;
@@ -127,7 +133,9 @@ export function SubscriptionByOfferPage({
     error: subscriptionError,
   } = useUserSubscription({ userId, userEmail });
 
-  const [selectedSegment, setSelectedSegment] = useState<string>('free');
+  const [selectedSegment, setSelectedSegment] = useState<string>(
+    initialOfferId ?? 'free'
+  );
   const [purchaseError, setPurchaseError] = useState<string | null>(null);
   const [isPurchasing, setIsPurchasing] = useState(false);
 
@@ -360,19 +368,20 @@ export function SubscriptionByOfferPage({
                     ) : null}
                   </div>
 
-                  {/* Right: price CTA button */}
-                  <button
-                    onClick={ctaAction}
-                    disabled={isPurchasing || !ctaAction}
-                    className={
-                      'ml-4 flex-shrink-0 rounded-lg px-4 py-2 text-sm font-semibold transition-colors ' +
-                      (isCurrentPlan
-                        ? 'bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 cursor-default'
-                        : 'bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed')
-                    }
-                  >
-                    {isCurrentPlan ? ctaLabel : `${priceStr} · ${ctaLabel}`}
-                  </button>
+                  {/* Right: price CTA button or current plan label */}
+                  {isCurrentPlan ? (
+                    <span className="ml-4 flex-shrink-0 text-sm font-semibold text-blue-600 dark:text-blue-400">
+                      {ctaLabel}
+                    </span>
+                  ) : (
+                    <button
+                      onClick={ctaAction}
+                      disabled={isPurchasing || !ctaAction}
+                      className="ml-4 flex-shrink-0 rounded-lg px-4 py-2 text-sm font-semibold transition-colors bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      {`${priceStr} · ${ctaLabel}`}
+                    </button>
+                  )}
                 </div>
               );
             })}
