@@ -3,11 +3,14 @@
  *
  * Subscription page that organizes packages by offering.
  * Uses a SegmentedControl to switch between offerings (with a 'Free' option).
- * Packages within each offer are sorted by duration (short to long).
- * Savings are calculated relative to the shortest duration package.
+ *
+ * - Free tab: shows a free-tier tile
+ * - Paid offering tabs: shows an offering description area (via callback),
+ *   followed by a list of duration options with savings and price CTAs.
  */
 
-import { useState } from 'react';
+import React, { useState } from 'react';
+import type { SubscriptionPeriod } from '@sudobility/types';
 import {
   useAllOfferings,
   useOfferingPackages,
@@ -19,13 +22,9 @@ import {
 import type { SubscriptionPackage } from '@sudobility/subscription_lib';
 import {
   SubscriptionLayout,
-  SubscriptionTile,
   SegmentedControl,
 } from '@sudobility/subscription-components';
-import type {
-  FreeTileConfig,
-  DiscountBadgeConfig,
-} from '@sudobility/subscription-components';
+import type { FreeTileConfig } from '@sudobility/subscription-components';
 
 export interface SubscriptionByOfferPageProps {
   /** Whether the user is logged in */
@@ -45,12 +44,33 @@ export interface SubscriptionByOfferPageProps {
   /** Additional CSS classes */
   className?: string;
   /**
-   * Translation function for localizing offer names and labels.
-   * Keys passed: offer identifiers (e.g. "basic", "premium"), "free".
+   * Translation function for localizing offer names, period labels, etc.
+   * Keys passed: offer identifiers (e.g. "basic", "premium"), "free",
+   * period names (e.g. "monthly", "yearly").
    * Falls back to the fallback string if not provided.
    */
   t?: (key: string, fallback: string) => string;
+  /**
+   * Render content describing what an offering includes.
+   * Called with the offering identifier (e.g. "basic", "premium").
+   * Return a list of strings or React elements shown in a styled container.
+   */
+  renderOfferingContent?: (offerId: string) => React.ReactNode;
 }
+
+/** Capitalize first letter fallback */
+function capitalize(s: string): string {
+  return s.charAt(0).toUpperCase() + s.slice(1);
+}
+
+/** Period display names used as fallbacks */
+const PERIOD_LABELS: Record<SubscriptionPeriod, string> = {
+  weekly: 'Weekly',
+  monthly: 'Monthly',
+  quarterly: 'Quarterly',
+  yearly: 'Yearly',
+  lifetime: 'Lifetime',
+};
 
 /**
  * Calculate savings percentage of a package relative to a base (shortest) package.
@@ -67,7 +87,6 @@ function calcSavingsPercent(
 
   if (baseMonths <= 0 || pkgMonths <= 0) return null;
   if (baseMonths === Infinity || pkgMonths === Infinity) return null;
-  // Same duration - no savings to show
   if (baseMonths === pkgMonths) return null;
 
   const baseMonthlyCost = basePkg.product.price / baseMonths;
@@ -86,11 +105,12 @@ export function SubscriptionByOfferPage({
   onNavigateToLogin,
   userId,
   userEmail,
-  featuresByPackage,
+  featuresByPackage: _featuresByPackage,
   freeFeatures,
   title = 'Choose Your Plan',
   className,
   t: translate,
+  renderOfferingContent,
 }: SubscriptionByOfferPageProps) {
   const loc = (key: string, fallback: string) =>
     translate ? translate(key, fallback) : fallback;
@@ -112,7 +132,6 @@ export function SubscriptionByOfferPage({
   const [isPurchasing, setIsPurchasing] = useState(false);
 
   // Always call useOfferingPackages (hooks can't be conditional).
-  // Use first offering as fallback; only consume result when selectedSegment !== 'free'.
   const fallbackOfferId = offerings[0]?.offerId ?? '';
   const activeOfferId =
     selectedSegment !== 'free' ? selectedSegment : fallbackOfferId;
@@ -151,12 +170,11 @@ export function SubscriptionByOfferPage({
     { value: 'free', label: loc('free', 'Free') },
     ...offerings.map((o) => ({
       value: o.offerId,
-      label: loc(o.offerId, o.offerId.charAt(0).toUpperCase() + o.offerId.slice(1)),
+      label: loc(o.offerId, capitalize(o.offerId)),
     })),
   ];
 
   // Shortest-duration package is the base for savings comparison
-  // (packages are already sorted short→long by useOfferingPackages)
   const basePkg = packages[0] ?? null;
 
   const getFreeTileConfig = (): FreeTileConfig | undefined => {
@@ -201,32 +219,19 @@ export function SubscriptionByOfferPage({
     };
   };
 
-  const getPaidTileCta = (pkg: SubscriptionPackage, offerId: string) => {
-    if (!isLoggedIn) {
-      return {
-        label: 'Log in to Continue',
-        onClick: onNavigateToLogin,
-      };
-    }
-
-    const hasSubscription = subscription?.isActive && subscription.packageId;
+  const getCtaLabel = (pkg: SubscriptionPackage): string => {
+    if (!isLoggedIn) return 'Log in to Continue';
     const isCurrentPlan = subscription?.packageId === pkg.packageId;
+    if (isCurrentPlan) return 'Current Plan';
+    const hasSubscription = subscription?.isActive && subscription.packageId;
+    return hasSubscription ? 'Change Subscription' : 'Subscribe';
+  };
 
-    if (isCurrentPlan) {
-      return undefined;
-    }
-
-    if (!hasSubscription) {
-      return {
-        label: 'Subscribe',
-        onClick: () => handlePurchase(pkg.packageId, offerId),
-      };
-    }
-
-    return {
-      label: 'Change Subscription',
-      onClick: () => handlePurchase(pkg.packageId, offerId),
-    };
+  const getCtaAction = (pkg: SubscriptionPackage, offerId: string) => {
+    if (!isLoggedIn) return onNavigateToLogin;
+    const isCurrentPlan = subscription?.packageId === pkg.packageId;
+    if (isCurrentPlan) return undefined;
+    return () => handlePurchase(pkg.packageId, offerId);
   };
 
   if (isLoading) {
@@ -287,7 +292,7 @@ export function SubscriptionByOfferPage({
       freeTileConfig={isFreeSelected ? getFreeTileConfig() : undefined}
       aboveProducts={
         segmentOptions.length > 1 ? (
-          <div className="flex justify-center">
+          <div className="flex justify-center mb-6">
             <SegmentedControl
               options={segmentOptions}
               value={selectedSegment}
@@ -297,45 +302,80 @@ export function SubscriptionByOfferPage({
         ) : undefined
       }
     >
-      {!isFreeSelected &&
-        packages.map((pkg) => {
-          const isCurrentPlan =
-            isLoggedIn &&
-            subscription?.isActive &&
-            subscription.packageId === pkg.packageId;
-          const cta = getPaidTileCta(pkg, selectedSegment);
+      {/* Offering content + duration list for paid offerings */}
+      {!isFreeSelected && (
+        <div className="col-span-full space-y-6">
+          {/* Offering description area */}
+          {renderOfferingContent && (
+            <div className="rounded-xl bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 p-5">
+              {renderOfferingContent(selectedSegment)}
+            </div>
+          )}
 
-          // Calculate savings badge relative to shortest duration
-          let discountBadge: DiscountBadgeConfig | undefined;
-          if (basePkg && pkg.packageId !== basePkg.packageId) {
-            const savings = calcSavingsPercent(basePkg, pkg);
-            if (savings !== null) {
-              discountBadge = {
-                text: `Save ${savings}%`,
-                isBestValue: pkg === packages[packages.length - 1],
-              };
-            }
-          }
+          {/* Duration options list */}
+          <div className="space-y-3">
+            {packages.map((pkg) => {
+              const period = pkg.product?.period;
+              const periodLabel = period
+                ? loc(period, PERIOD_LABELS[period] ?? capitalize(period))
+                : pkg.name;
+              const isCurrentPlan =
+                isLoggedIn &&
+                subscription?.isActive &&
+                subscription.packageId === pkg.packageId;
+              const savings =
+                basePkg && pkg.packageId !== basePkg.packageId
+                  ? calcSavingsPercent(basePkg, pkg)
+                  : null;
+              const ctaLabel = getCtaLabel(pkg);
+              const ctaAction = getCtaAction(pkg, selectedSegment);
+              const priceStr = pkg.product?.priceString ?? '$0';
 
-          return (
-            <SubscriptionTile
-              key={pkg.packageId}
-              id={pkg.packageId}
-              title={pkg.name}
-              price={pkg.product?.priceString ?? '$0'}
-              periodLabel={
-                pkg.product ? `/${pkg.product.period}` : undefined
-              }
-              features={featuresByPackage?.[pkg.packageId] ?? []}
-              isSelected={false}
-              onSelect={() => {}}
-              isCurrentPlan={isCurrentPlan}
-              ctaButton={cta}
-              disabled={isPurchasing}
-              discountBadge={discountBadge}
-            />
-          );
-        })}
+              return (
+                <div
+                  key={pkg.packageId}
+                  className={
+                    'flex items-center justify-between rounded-xl p-4 transition-all ' +
+                    (isCurrentPlan
+                      ? 'bg-blue-50 dark:bg-blue-900/20 border-2 border-blue-500 dark:border-blue-400'
+                      : 'bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700')
+                  }
+                >
+                  {/* Left: duration title + savings subtitle */}
+                  <div className="min-w-0 flex-1">
+                    <p className="text-base font-semibold text-gray-900 dark:text-gray-100">
+                      {periodLabel}
+                    </p>
+                    {savings !== null ? (
+                      <p className="text-sm font-medium text-green-600 dark:text-green-400">
+                        Save {savings}%
+                      </p>
+                    ) : isCurrentPlan ? (
+                      <p className="text-sm font-medium text-blue-600 dark:text-blue-400">
+                        Current Plan
+                      </p>
+                    ) : null}
+                  </div>
+
+                  {/* Right: price CTA button */}
+                  <button
+                    onClick={ctaAction}
+                    disabled={isPurchasing || !ctaAction}
+                    className={
+                      'ml-4 flex-shrink-0 rounded-lg px-4 py-2 text-sm font-semibold transition-colors ' +
+                      (isCurrentPlan
+                        ? 'bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 cursor-default'
+                        : 'bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed')
+                    }
+                  >
+                    {isCurrentPlan ? ctaLabel : `${priceStr} · ${ctaLabel}`}
+                  </button>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
     </SubscriptionLayout>
   );
 }

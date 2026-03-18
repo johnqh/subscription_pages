@@ -15,6 +15,16 @@ vi.mock('@sudobility/subscription_lib', () => ({
   useUserSubscription: () => mockUseUserSubscription(),
   getSubscriptionInstance: () => mockGetSubscriptionInstance(),
   refreshSubscription: () => mockRefreshSubscription(),
+  periodToMonths: (period: string) => {
+    const map: Record<string, number> = {
+      weekly: 0.25,
+      monthly: 1,
+      quarterly: 3,
+      yearly: 12,
+      lifetime: Infinity,
+    };
+    return map[period] ?? 1;
+  },
 }));
 
 // Mock subscription-components
@@ -54,24 +64,6 @@ const MockSubscriptionLayout = vi.fn(
   )
 );
 
-const MockSubscriptionTile = vi.fn(
-  ({ id, title, ctaButton, isCurrentPlan, disabled }: any) => (
-    <div data-testid={`tile-${id}`}>
-      <span>{title}</span>
-      {isCurrentPlan && <span data-testid="current-plan-badge">Current</span>}
-      {ctaButton && (
-        <button
-          onClick={ctaButton.onClick}
-          disabled={disabled}
-          data-testid={`cta-${id}`}
-        >
-          {ctaButton.label}
-        </button>
-      )}
-    </div>
-  )
-);
-
 const MockSegmentedControl = vi.fn(
   ({ options, value, onChange }: any) => (
     <div data-testid="segmented-control">
@@ -91,7 +83,6 @@ const MockSegmentedControl = vi.fn(
 
 vi.mock('@sudobility/subscription-components', () => ({
   SubscriptionLayout: (props: any) => MockSubscriptionLayout(props),
-  SubscriptionTile: (props: any) => MockSubscriptionTile(props),
   SegmentedControl: (props: any) => MockSegmentedControl(props),
 }));
 
@@ -289,7 +280,7 @@ describe('SubscriptionByOfferPage', () => {
     expect(screen.getByTestId('segment-premium')).toBeTruthy();
   });
 
-  it('shows packages when switching to an offering segment', () => {
+  it('shows duration list when switching to an offering segment', () => {
     mockUseAllOfferings.mockReturnValue({
       offerings: mockOfferings,
       isLoading: false,
@@ -318,8 +309,9 @@ describe('SubscriptionByOfferPage', () => {
     // Switch to 'basic' offering
     fireEvent.click(screen.getByTestId('segment-basic'));
 
-    expect(screen.getByTestId('tile-basic_monthly')).toBeTruthy();
-    expect(screen.getByText('Log in to Continue')).toBeTruthy();
+    // Shows period label and login CTA with price
+    expect(screen.getByText('Monthly')).toBeTruthy();
+    expect(screen.getByText('$4.99 · Log in to Continue')).toBeTruthy();
   });
 
   it('shows "Subscribe" CTAs when logged in without subscription', () => {
@@ -350,7 +342,7 @@ describe('SubscriptionByOfferPage', () => {
     // Switch to offering
     fireEvent.click(screen.getByTestId('segment-basic'));
 
-    expect(screen.getByText('Subscribe')).toBeTruthy();
+    expect(screen.getByText('$4.99 · Subscribe')).toBeTruthy();
   });
 
   it('shows current subscription status', () => {
@@ -390,7 +382,7 @@ describe('SubscriptionByOfferPage', () => {
     expect(screen.getByText('Active Subscription')).toBeTruthy();
   });
 
-  it('marks current plan tile and hides CTA for it', () => {
+  it('marks current plan in the list', () => {
     mockUseAllOfferings.mockReturnValue({
       offerings: mockOfferings,
       isLoading: false,
@@ -424,8 +416,8 @@ describe('SubscriptionByOfferPage', () => {
     // Switch to basic offering
     fireEvent.click(screen.getByTestId('segment-basic'));
 
-    expect(screen.getByTestId('current-plan-badge')).toBeTruthy();
-    expect(screen.queryByTestId('cta-basic_monthly')).toBeNull();
+    // Current plan shows "Current Plan" as both subtitle and button label
+    expect(screen.getAllByText('Current Plan').length).toBeGreaterThanOrEqual(1);
   });
 
   it('handles purchase flow', async () => {
@@ -462,7 +454,7 @@ describe('SubscriptionByOfferPage', () => {
     // Switch to basic offering
     fireEvent.click(screen.getByTestId('segment-basic'));
 
-    fireEvent.click(screen.getByText('Subscribe'));
+    fireEvent.click(screen.getByText('$4.99 · Subscribe'));
 
     await waitFor(() => {
       expect(mockPurchase).toHaveBeenCalledWith({
@@ -506,7 +498,7 @@ describe('SubscriptionByOfferPage', () => {
     // Switch to basic offering
     fireEvent.click(screen.getByTestId('segment-basic'));
 
-    fireEvent.click(screen.getByText('Subscribe'));
+    fireEvent.click(screen.getByText('$4.99 · Subscribe'));
 
     await waitFor(() => {
       expect(screen.getByTestId('error').textContent).toBe('Payment failed');
@@ -575,6 +567,104 @@ describe('SubscriptionByOfferPage', () => {
     // Switch to premium offering
     fireEvent.click(screen.getByTestId('segment-premium'));
 
-    expect(screen.getByText('Change Subscription')).toBeTruthy();
+    expect(screen.getByText('$9.99 · Change Subscription')).toBeTruthy();
+  });
+
+  it('renders offering content when renderOfferingContent is provided', () => {
+    mockUseAllOfferings.mockReturnValue({
+      offerings: mockOfferings,
+      isLoading: false,
+      error: null,
+    });
+    mockUseOfferingPackages.mockReturnValue({
+      packages: mockOfferings[0].packages,
+      isLoading: false,
+      error: null,
+    });
+    mockUseUserSubscription.mockReturnValue({
+      subscription: null,
+      isLoading: false,
+      error: null,
+    });
+
+    render(
+      <SubscriptionByOfferPage
+        isLoggedIn={false}
+        onNavigateToLogin={() => {}}
+        renderOfferingContent={(offerId) => (
+          <p data-testid="offering-content">Features for {offerId}</p>
+        )}
+      />
+    );
+
+    // Switch to basic offering
+    fireEvent.click(screen.getByTestId('segment-basic'));
+
+    expect(screen.getByTestId('offering-content').textContent).toBe(
+      'Features for basic'
+    );
+  });
+
+  it('shows savings for longer duration packages', () => {
+    const multiDurationPackages = [
+      {
+        packageId: 'basic_monthly',
+        name: 'Basic Monthly',
+        product: {
+          productId: 'basic_monthly',
+          name: 'Basic Monthly',
+          price: 4.99,
+          priceString: '$4.99',
+          currency: 'USD',
+          period: 'monthly' as const,
+          periodDuration: 'P1M',
+        },
+        entitlements: ['basic'],
+      },
+      {
+        packageId: 'basic_yearly',
+        name: 'Basic Yearly',
+        product: {
+          productId: 'basic_yearly',
+          name: 'Basic Yearly',
+          price: 39.99,
+          priceString: '$39.99',
+          currency: 'USD',
+          period: 'yearly' as const,
+          periodDuration: 'P1Y',
+        },
+        entitlements: ['basic'],
+      },
+    ];
+
+    mockUseAllOfferings.mockReturnValue({
+      offerings: mockOfferings,
+      isLoading: false,
+      error: null,
+    });
+    mockUseOfferingPackages.mockReturnValue({
+      packages: multiDurationPackages,
+      isLoading: false,
+      error: null,
+    });
+    mockUseUserSubscription.mockReturnValue({
+      subscription: null,
+      isLoading: false,
+      error: null,
+    });
+
+    render(
+      <SubscriptionByOfferPage
+        isLoggedIn={true}
+        onNavigateToLogin={() => {}}
+        userId="user-1"
+      />
+    );
+
+    fireEvent.click(screen.getByTestId('segment-basic'));
+
+    // Yearly should show savings vs monthly
+    // monthly: $4.99/mo, yearly: $39.99/12 = $3.33/mo → save 33%
+    expect(screen.getByText('Save 33%')).toBeTruthy();
   });
 });
