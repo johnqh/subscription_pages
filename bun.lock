@@ -6,7 +6,7 @@
       "name": "@sudobility/subscription_pages",
       "devDependencies": {
         "@sudobility/subscription-components": "^1.0.27",
-        "@sudobility/subscription_lib": "^0.0.27",
+        "@sudobility/subscription_lib": "^0.0.28",
         "@sudobility/types": "^1.9.58",
         "@testing-library/jest-dom": "^6.0.0",
         "@testing-library/react": "^16.0.0",
@@ -28,7 +28,7 @@
       },
       "peerDependencies": {
         "@sudobility/subscription-components": "^1.0.27",
-        "@sudobility/subscription_lib": "^0.0.27",
+        "@sudobility/subscription_lib": "^0.0.28",
         "@sudobility/types": "^1.9.58",
         "react": "^18.0.0 || ^19.0.0",
         "react-dom": "^18.0.0 || ^19.0.0",
@@ -334,7 +334,7 @@
 
     "@sudobility/subscription-components": ["@sudobility/subscription-components@1.0.27", "", { "optionalDependencies": { "@rollup/rollup-linux-x64-gnu": "4.52.5", "@rollup/rollup-linux-x64-musl": "4.52.5" }, "peerDependencies": { "@heroicons/react": "^2.2.0", "@revenuecat/purchases-js": "^1.0.0", "@sudobility/components": "^5.0.7", "@sudobility/design": "^1.1.18", "react": "^18.0.0 || ^19.0.0", "react-dom": "^18.0.0 || ^19.0.0" }, "optionalPeers": ["@revenuecat/purchases-js"] }, "sha512-LpbB0JI8VVi3Ye1HDxaL/voMqKs0Pu3a+4BTO/mILcYFedQCfF7mD+36vUEVX2so2NpHPoITtGnYue7pFyGomw=="],
 
-    "@sudobility/subscription_lib": ["@sudobility/subscription_lib@0.0.27", "", { "peerDependencies": { "@revenuecat/purchases-js": "^1.0.0", "@sudobility/types": "^1.9.58", "react": "^18.0.0 || ^19.0.0", "react-native-purchases": ">=7.0.0" }, "optionalPeers": ["@revenuecat/purchases-js", "react-native-purchases"] }, "sha512-SFGRVuyE5c5hYIKDZynWOg++Izhqu4TAhVI3o81jMHS2XbEz+hdVgW88ZYlxr5IcVtmj24sHcKxDqErjeNtlzQ=="],
+    "@sudobility/subscription_lib": ["@sudobility/subscription_lib@0.0.28", "", { "peerDependencies": { "@revenuecat/purchases-js": "^1.0.0", "@sudobility/types": "^1.9.58", "react": "^18.0.0 || ^19.0.0", "react-native-purchases": ">=7.0.0" }, "optionalPeers": ["@revenuecat/purchases-js", "react-native-purchases"] }, "sha512-BNOytZIFdgzVFr2V0o/FIyeFnVdeHVOMM55KgaxpNj9WOzHGSU6xaScAOADvROET0qQxpojXVOUQa4hhITVz7Q=="],
 
     "@sudobility/types": ["@sudobility/types@1.9.58", "", {}, "sha512-GD6pS8C8loS8SnD7ynzDBCJ++Z9N0vzLTEO03nxFISffrEX67nNOrBEs8LqCU3yFn4LJowiIV7JyigNLCQUAoA=="],
 
