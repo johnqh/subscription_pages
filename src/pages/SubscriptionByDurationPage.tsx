@@ -6,10 +6,15 @@
  */
 
 import { useState } from 'react';
-import type { SubscriptionPeriod } from '@sudobility/types';
+import {
+  SubscriptionPlatform,
+  type SubscriptionPeriod,
+} from '@sudobility/types';
+import type { NetworkClient } from '@sudobility/types';
 import {
   usePackagesByDuration,
   useUserSubscription,
+  useBackendSubscription,
   getSubscriptionInstance,
   refreshSubscription,
 } from '@sudobility/subscription_lib';
@@ -20,6 +25,7 @@ import {
   SegmentedControl,
 } from '@sudobility/subscription-components';
 import type { FreeTileConfig } from '@sudobility/subscription-components';
+import { CrossPlatformSubscriptionInfo } from '../components/CrossPlatformSubscriptionInfo';
 
 export interface SubscriptionByDurationPageProps {
   /** Whether the user is logged in */
@@ -38,6 +44,16 @@ export interface SubscriptionByDurationPageProps {
   title?: string;
   /** Additional CSS classes */
   className?: string;
+  /** Current platform (defaults to Web) */
+  currentPlatform?: SubscriptionPlatform;
+  /** Network client for backend subscription fetch */
+  networkClient?: NetworkClient;
+  /** Backend API base URL */
+  baseUrl?: string;
+  /** Auth token for backend API */
+  token?: string;
+  /** Include sandbox purchases */
+  testMode?: boolean;
 }
 
 export function SubscriptionByDurationPage({
@@ -49,6 +65,11 @@ export function SubscriptionByDurationPage({
   freeFeatures,
   title = 'Choose Your Plan',
   className,
+  currentPlatform = SubscriptionPlatform.Web,
+  networkClient,
+  baseUrl,
+  token,
+  testMode,
 }: SubscriptionByDurationPageProps) {
   const {
     packagesByDuration,
@@ -62,6 +83,20 @@ export function SubscriptionByDurationPage({
     isLoading: isLoadingSubscription,
     error: subscriptionError,
   } = useUserSubscription({ userId, userEmail });
+
+  // Backend subscription for platform detection
+  const hasBackendConfig = !!(networkClient && baseUrl && token && userId);
+  const backendSub = useBackendSubscription(
+    networkClient ?? ({} as NetworkClient),
+    baseUrl ?? '',
+    token ?? '',
+    userId ?? '',
+    { testMode, enabled: hasBackendConfig }
+  );
+
+  const subscriptionPlatform = backendSub.data?.platform ?? null;
+  const isPlatformMatch =
+    !subscriptionPlatform || subscriptionPlatform === currentPlatform;
 
   const [selectedDuration, setSelectedDuration] =
     useState<SubscriptionPeriod | null>(null);
@@ -111,32 +146,27 @@ export function SubscriptionByDurationPage({
     const hasSubscription = subscription?.isActive && subscription.packageId;
 
     if (!hasSubscription) {
-      // Logged in, no subscription - free is current plan
+      // Logged in, no subscription - free is current plan, no CTA
       return {
         title: 'Free',
         price: '$0',
         features: freeFeatures ?? [],
-        ctaButton: {
-          label: 'Current Plan',
-        },
-        topBadge: { text: 'Current Plan', color: 'blue' },
+        topBadge: { text: 'Current', color: 'blue' },
       };
     }
 
-    // Logged in with subscription - offer to cancel
+    // Logged in with subscription - offer to manage
     return {
       title: 'Free',
       price: '$0',
       features: freeFeatures ?? [],
-      ctaButton: {
-        label: 'Cancel Subscription',
-        onClick: () => {
-          if (subscription.managementUrl) {
-            window.open(subscription.managementUrl, '_blank');
-          }
-        },
-      },
     };
+  };
+
+  const openManagementUrl = () => {
+    if (subscription?.managementUrl) {
+      window.open(subscription.managementUrl, '_blank');
+    }
   };
 
   const getPaidTileCta = (pkg: PackageWithOffer) => {
@@ -150,19 +180,16 @@ export function SubscriptionByDurationPage({
     const hasSubscription = subscription?.isActive && subscription.packageId;
     const isCurrentPlan = subscription?.packageId === pkg.package.packageId;
 
-    if (isCurrentPlan) {
-      return undefined; // No CTA for current plan
-    }
-
-    if (!hasSubscription) {
+    if (hasSubscription) {
+      // All CTAs go to management URL when subscribed
       return {
-        label: 'Subscribe',
-        onClick: () => handlePurchase(pkg.package.packageId, pkg.offerId),
+        label: isCurrentPlan ? 'Manage Subscription' : 'Change Subscription',
+        onClick: openManagementUrl,
       };
     }
 
     return {
-      label: 'Change Subscription',
+      label: 'Subscribe',
       onClick: () => handlePurchase(pkg.package.packageId, pkg.offerId),
     };
   };
@@ -175,6 +202,23 @@ export function SubscriptionByDurationPage({
         variant="cta"
       >
         <p>Loading subscription plans...</p>
+      </SubscriptionLayout>
+    );
+  }
+
+  // Cross-platform: show info instead of purchase UI
+  if (!isPlatformMatch && backendSub.data) {
+    return (
+      <SubscriptionLayout
+        title={title}
+        className={className}
+        variant="cta"
+      >
+        <CrossPlatformSubscriptionInfo
+          backendSubscription={backendSub.data}
+          managementUrl={subscription?.managementUrl}
+          currentPlatform={currentPlatform}
+        />
       </SubscriptionLayout>
     );
   }

@@ -10,11 +10,16 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import type { SubscriptionPeriod } from '@sudobility/types';
+import {
+  SubscriptionPlatform,
+  type SubscriptionPeriod,
+} from '@sudobility/types';
+import type { NetworkClient } from '@sudobility/types';
 import {
   useAllOfferings,
   useOfferingPackages,
   useUserSubscription,
+  useBackendSubscription,
   getSubscriptionInstance,
   refreshSubscription,
   periodToMonths,
@@ -25,6 +30,7 @@ import {
   SegmentedControl,
 } from '@sudobility/subscription-components';
 import type { FreeTileConfig } from '@sudobility/subscription-components';
+import { CrossPlatformSubscriptionInfo } from '../components/CrossPlatformSubscriptionInfo';
 
 export interface SubscriptionByOfferPageProps {
   /** Whether the user is logged in */
@@ -43,6 +49,16 @@ export interface SubscriptionByOfferPageProps {
   title?: string;
   /** Additional CSS classes */
   className?: string;
+  /** Current platform (defaults to Web) */
+  currentPlatform?: SubscriptionPlatform;
+  /** Network client for backend subscription fetch */
+  networkClient?: NetworkClient;
+  /** Backend API base URL */
+  baseUrl?: string;
+  /** Auth token for backend API */
+  token?: string;
+  /** Include sandbox purchases */
+  testMode?: boolean;
   /**
    * Translation function for localizing offer names, period labels, etc.
    * Keys passed: offer identifiers (e.g. "basic", "premium"), "free",
@@ -114,6 +130,11 @@ export function SubscriptionByOfferPage({
   freeFeatures,
   title = 'Choose Your Plan',
   className,
+  currentPlatform = SubscriptionPlatform.Web,
+  networkClient,
+  baseUrl,
+  token,
+  testMode,
   t: translate,
   renderOfferingContent,
   initialOfferId,
@@ -132,6 +153,20 @@ export function SubscriptionByOfferPage({
     isLoading: isLoadingSubscription,
     error: subscriptionError,
   } = useUserSubscription({ userId, userEmail });
+
+  // Backend subscription for platform detection
+  const hasBackendConfig = !!(networkClient && baseUrl && token && userId);
+  const backendSub = useBackendSubscription(
+    networkClient ?? ({} as NetworkClient),
+    baseUrl ?? '',
+    token ?? '',
+    userId ?? '',
+    { testMode, enabled: hasBackendConfig }
+  );
+
+  const subscriptionPlatform = backendSub.data?.platform ?? null;
+  const isPlatformMatch =
+    !subscriptionPlatform || subscriptionPlatform === currentPlatform;
 
   const [selectedSegment, setSelectedSegment] = useState<string>(
     initialOfferId ?? 'free'
@@ -209,45 +244,47 @@ export function SubscriptionByOfferPage({
     const hasSubscription = subscription?.isActive && subscription.packageId;
 
     if (!hasSubscription) {
+      // Logged in, no subscription - free is current plan, no CTA
       return {
         title: loc('free', 'Free'),
         price: '$0',
         features: freeFeatures ?? [],
-        ctaButton: {
-          label: 'Current Plan',
-        },
-        topBadge: { text: 'Current Plan', color: 'blue' },
+        topBadge: { text: 'Current', color: 'blue' },
       };
     }
 
+    // Logged in with subscription - no special free tile CTA
     return {
       title: loc('free', 'Free'),
       price: '$0',
       features: freeFeatures ?? [],
-      ctaButton: {
-        label: 'Cancel Subscription',
-        onClick: () => {
-          if (subscription.managementUrl) {
-            window.open(subscription.managementUrl, '_blank');
-          }
-        },
-      },
     };
+  };
+
+  const openManagementUrl = () => {
+    if (subscription?.managementUrl) {
+      window.open(subscription.managementUrl, '_blank');
+    }
   };
 
   const getCtaLabel = (pkg: SubscriptionPackage): string => {
     if (!isLoggedIn) return 'Log in to Continue';
-    const isCurrentPlan = subscription?.packageId === pkg.packageId;
-    if (isCurrentPlan) return 'Current Plan';
     const hasSubscription = subscription?.isActive && subscription.packageId;
-    return hasSubscription ? 'Change Subscription' : 'Subscribe';
+    if (hasSubscription) {
+      const isCurrentPlan = subscription?.packageId === pkg.packageId;
+      return isCurrentPlan ? 'Manage Subscription' : 'Change Subscription';
+    }
+    return 'Subscribe';
   };
 
-  const getCtaAction = (pkg: SubscriptionPackage, offerId: string) => {
+  const getCtaAction = (pkg: SubscriptionPackage, _offerId: string) => {
     if (!isLoggedIn) return onNavigateToLogin;
-    const isCurrentPlan = subscription?.packageId === pkg.packageId;
-    if (isCurrentPlan) return undefined;
-    return () => handlePurchase(pkg.packageId, offerId);
+    const hasSubscription = subscription?.isActive && subscription.packageId;
+    if (hasSubscription) {
+      // All CTAs go to management URL when subscribed
+      return openManagementUrl;
+    }
+    return () => handlePurchase(pkg.packageId, _offerId);
   };
 
   if (isLoading) {
@@ -258,6 +295,23 @@ export function SubscriptionByOfferPage({
         variant="cta"
       >
         <p>Loading subscription plans...</p>
+      </SubscriptionLayout>
+    );
+  }
+
+  // Cross-platform: show info instead of purchase UI
+  if (!isPlatformMatch && backendSub.data) {
+    return (
+      <SubscriptionLayout
+        title={title}
+        className={className}
+        variant="cta"
+      >
+        <CrossPlatformSubscriptionInfo
+          backendSubscription={backendSub.data}
+          managementUrl={subscription?.managementUrl}
+          currentPlatform={currentPlatform}
+        />
       </SubscriptionLayout>
     );
   }
@@ -376,20 +430,14 @@ export function SubscriptionByOfferPage({
                     ) : null}
                   </div>
 
-                  {/* Right: price CTA button or current plan label */}
-                  {isCurrentPlan ? (
-                    <span className="ml-4 flex-shrink-0 text-sm font-semibold text-blue-600 dark:text-blue-400">
-                      {ctaLabel}
-                    </span>
-                  ) : (
-                    <button
-                      onClick={ctaAction}
-                      disabled={isPurchasing || !ctaAction}
-                      className="ml-4 flex-shrink-0 rounded-lg px-4 py-2 text-sm font-semibold transition-colors bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      {`${priceStr} · ${ctaLabel}`}
-                    </button>
-                  )}
+                  {/* Right: price CTA button */}
+                  <button
+                    onClick={ctaAction}
+                    disabled={isPurchasing || !ctaAction}
+                    className="ml-4 flex-shrink-0 rounded-lg px-4 py-2 text-sm font-semibold transition-colors bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {`${priceStr} · ${ctaLabel}`}
+                  </button>
                 </div>
               );
             })}

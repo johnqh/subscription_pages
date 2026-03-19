@@ -12,6 +12,11 @@ const mockRefreshSubscription = vi.fn();
 vi.mock('@sudobility/subscription_lib', () => ({
   usePackagesByDuration: () => mockUsePackagesByDuration(),
   useUserSubscription: () => mockUseUserSubscription(),
+  useBackendSubscription: () => ({
+    data: undefined,
+    isLoading: false,
+    error: null,
+  }),
   getSubscriptionInstance: () => mockGetSubscriptionInstance(),
   refreshSubscription: () => mockRefreshSubscription(),
 }));
@@ -47,9 +52,11 @@ const MockSubscriptionLayout = vi.fn(
       {freeTileConfig && (
         <div data-testid="free-tile">
           <span>{freeTileConfig.title}</span>
-          <button onClick={freeTileConfig.ctaButton.onClick}>
-            {freeTileConfig.ctaButton.label}
-          </button>
+          {freeTileConfig.ctaButton && (
+            <button onClick={freeTileConfig.ctaButton.onClick}>
+              {freeTileConfig.ctaButton.label}
+            </button>
+          )}
           {freeTileConfig.topBadge && (
             <span data-testid="free-badge">{freeTileConfig.topBadge.text}</span>
           )}
@@ -249,7 +256,7 @@ describe('SubscriptionByDurationPage', () => {
       />
     );
 
-    expect(screen.getByTestId('free-badge').textContent).toBe('Current Plan');
+    expect(screen.getByTestId('free-badge').textContent).toBe('Current');
     expect(screen.getByText('Subscribe')).toBeTruthy();
   });
 
@@ -292,8 +299,9 @@ describe('SubscriptionByDurationPage', () => {
 
     expect(screen.getByTestId('current-status')).toBeTruthy();
     expect(screen.getByText('Active Subscription')).toBeTruthy();
-    // Current plan tile should not have a CTA button
-    expect(screen.queryByTestId('cta-pro_monthly')).toBeNull();
+    // Current plan tile should have "Manage Subscription" CTA
+    expect(screen.getByTestId('cta-pro_monthly')).toBeTruthy();
+    expect(screen.getByText('Manage Subscription')).toBeTruthy();
     expect(screen.getByTestId('current-plan-badge')).toBeTruthy();
   });
 

@@ -5,9 +5,10 @@
     "": {
       "name": "@sudobility/subscription_pages",
       "devDependencies": {
-        "@sudobility/subscription-components": "^1.0.27",
-        "@sudobility/subscription_lib": "^0.0.31",
+        "@sudobility/subscription-components": "^1.0.28",
+        "@sudobility/subscription_lib": "^0.0.33",
         "@sudobility/types": "^1.9.59",
+        "@tanstack/react-query": "^5.91.2",
         "@testing-library/jest-dom": "^6.0.0",
         "@testing-library/react": "^16.0.0",
         "@types/react": "^19.2.5",
@@ -27,8 +28,8 @@
         "vitest": "^4.0.0",
       },
       "peerDependencies": {
-        "@sudobility/subscription-components": "^1.0.27",
-        "@sudobility/subscription_lib": "^0.0.31",
+        "@sudobility/subscription-components": "^1.0.28",
+        "@sudobility/subscription_lib": "^0.0.33",
         "@sudobility/types": "^1.9.59",
         "react": "^18.0.0 || ^19.0.0",
         "react-dom": "^18.0.0 || ^19.0.0",
@@ -332,11 +333,15 @@
 
     "@sudobility/design": ["@sudobility/design@1.1.23", "", { "peerDependencies": { "clsx": ">=2.0.0", "tailwind-merge": ">=2.0.0" } }, "sha512-lVjGgQbFXQF7QkVRXHU3UKS7oCeGwZaj2hTaayIYzp5Uo156BQqAXO4AljPAM0xZqh/R+km3keCzRNkPyhMDPQ=="],
 
-    "@sudobility/subscription-components": ["@sudobility/subscription-components@1.0.27", "", { "optionalDependencies": { "@rollup/rollup-linux-x64-gnu": "4.52.5", "@rollup/rollup-linux-x64-musl": "4.52.5" }, "peerDependencies": { "@heroicons/react": "^2.2.0", "@revenuecat/purchases-js": "^1.0.0", "@sudobility/components": "^5.0.7", "@sudobility/design": "^1.1.18", "react": "^18.0.0 || ^19.0.0", "react-dom": "^18.0.0 || ^19.0.0" }, "optionalPeers": ["@revenuecat/purchases-js"] }, "sha512-LpbB0JI8VVi3Ye1HDxaL/voMqKs0Pu3a+4BTO/mILcYFedQCfF7mD+36vUEVX2so2NpHPoITtGnYue7pFyGomw=="],
+    "@sudobility/subscription-components": ["@sudobility/subscription-components@1.0.28", "", { "optionalDependencies": { "@rollup/rollup-linux-x64-gnu": "4.52.5", "@rollup/rollup-linux-x64-musl": "4.52.5" }, "peerDependencies": { "@heroicons/react": "^2.2.0", "@revenuecat/purchases-js": "^1.0.0", "@sudobility/components": "^5.0.7", "@sudobility/design": "^1.1.18", "react": "^18.0.0 || ^19.0.0", "react-dom": "^18.0.0 || ^19.0.0" }, "optionalPeers": ["@revenuecat/purchases-js"] }, "sha512-UoRJ1dJd4NlVRymmTF0FXGarjhamrSni1Zuxr75vj3K+73pOx/yuQwJvi3boZp+CMytU7WsmyIraaDdYpih+bQ=="],
 
-    "@sudobility/subscription_lib": ["@sudobility/subscription_lib@0.0.31", "", { "peerDependencies": { "@revenuecat/purchases-js": "^1.0.0", "@sudobility/types": "^1.9.59", "@tanstack/react-query": "^5.0.0", "react": "^18.0.0 || ^19.0.0", "react-native-purchases": ">=7.0.0" }, "optionalPeers": ["@revenuecat/purchases-js", "@tanstack/react-query", "react-native-purchases"] }, "sha512-7DSmCZaPBnhJ3liZjPE8lBJR2nkFZ+aHVqUCcHia/UFM7AXiwJOWmUGOZCnLoJo9in81A4xV2FPP1tTIrmJ5rA=="],
+    "@sudobility/subscription_lib": ["@sudobility/subscription_lib@0.0.33", "", { "peerDependencies": { "@revenuecat/purchases-js": "^1.0.0", "@sudobility/types": "^1.9.59", "@tanstack/react-query": "^5.0.0", "react": "^18.0.0 || ^19.0.0", "react-native-purchases": ">=7.0.0" }, "optionalPeers": ["@revenuecat/purchases-js", "@tanstack/react-query", "react-native-purchases"] }, "sha512-AgsCd6DYe/bz7cfZ3HkxiaKSmsfXijHYbuwM3x+df2Q1j9b4574RIKOEMs32jkZj05igprbikcaXzRrQp6yxBw=="],
 
     "@sudobility/types": ["@sudobility/types@1.9.59", "", {}, "sha512-ysz2JU1wu31H26TktCkgZZD2DQqpMX5KVLMiVuFY7ndPYMjNtoYzZoiigV1juHz0HWSh3LIFbRBR73O6UTg7Aw=="],
+
+    "@tanstack/query-core": ["@tanstack/query-core@5.91.2", "", {}, "sha512-Uz2pTgPC1mhqrrSGg18RKCWT/pkduAYtxbcyIyKBhw7dTWjXZIzqmpzO2lBkyWr4hlImQgpu1m1pei3UnkFRWw=="],
+
+    "@tanstack/react-query": ["@tanstack/react-query@5.91.2", "", { "dependencies": { "@tanstack/query-core": "5.91.2" }, "peerDependencies": { "react": "^18 || ^19" } }, "sha512-GClLPzbM57iFXv+FlvOUL56XVe00PxuTaVEyj1zAObhRiKF008J5vedmaq7O6ehs+VmPHe8+PUQhMuEyv8d9wQ=="],
 
     "@testing-library/dom": ["@testing-library/dom@10.4.1", "", { "dependencies": { "@babel/code-frame": "^7.10.4", "@babel/runtime": "^7.12.5", "@types/aria-query": "^5.0.1", "aria-query": "5.3.0", "dom-accessibility-api": "^0.5.9", "lz-string": "^1.5.0", "picocolors": "1.1.1", "pretty-format": "^27.0.2" } }, "sha512-o4PXJQidqJl82ckFaXUeoAW+XysPLauYI43Abki5hABd853iMhitooc6znOnczgbTYmEP6U6/y1ZyKAIsvMKGg=="],
 

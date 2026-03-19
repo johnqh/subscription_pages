@@ -13,6 +13,11 @@ vi.mock('@sudobility/subscription_lib', () => ({
   useAllOfferings: () => mockUseAllOfferings(),
   useOfferingPackages: () => mockUseOfferingPackages(),
   useUserSubscription: () => mockUseUserSubscription(),
+  useBackendSubscription: () => ({
+    data: undefined,
+    isLoading: false,
+    error: null,
+  }),
   getSubscriptionInstance: () => mockGetSubscriptionInstance(),
   refreshSubscription: () => mockRefreshSubscription(),
   periodToMonths: (period: string) => {
@@ -51,9 +56,11 @@ const MockSubscriptionLayout = vi.fn(
       {freeTileConfig && (
         <div data-testid="free-tile">
           <span>{freeTileConfig.title}</span>
-          <button onClick={freeTileConfig.ctaButton.onClick}>
-            {freeTileConfig.ctaButton.label}
-          </button>
+          {freeTileConfig.ctaButton && (
+            <button onClick={freeTileConfig.ctaButton.onClick}>
+              {freeTileConfig.ctaButton.label}
+            </button>
+          )}
           {freeTileConfig.topBadge && (
             <span data-testid="free-badge">{freeTileConfig.topBadge.text}</span>
           )}
@@ -248,7 +255,7 @@ describe('SubscriptionByOfferPage', () => {
       />
     );
 
-    expect(screen.getByTestId('free-badge').textContent).toBe('Current Plan');
+    expect(screen.getByTestId('free-badge').textContent).toBe('Current');
   });
 
   it('shows segmented control with free and offering segments', () => {
