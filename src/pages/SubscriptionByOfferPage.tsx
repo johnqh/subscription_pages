@@ -271,7 +271,7 @@ export function SubscriptionByOfferPage({
     if (!isLoggedIn) return 'Log in to Continue';
     const hasSubscription = subscription?.isActive && subscription.packageId;
     if (hasSubscription) {
-      const isCurrentPlan = subscription?.packageId === pkg.packageId;
+      const isCurrentPlan = subscription?.packageId === pkg.packageId && subscription?.offeringId === selectedSegment;
       return isCurrentPlan ? 'Manage Subscription' : 'Change Subscription';
     }
     return 'Subscribe';
@@ -392,7 +392,8 @@ export function SubscriptionByOfferPage({
               const isCurrentPlan =
                 isLoggedIn &&
                 subscription?.isActive &&
-                subscription.packageId === pkg.packageId;
+                subscription.packageId === pkg.packageId &&
+                subscription.offeringId === selectedSegment;
               const savings =
                 basePkg && pkg.packageId !== basePkg.packageId
                   ? calcSavingsPercent(basePkg, pkg)

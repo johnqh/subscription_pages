@@ -280,6 +280,7 @@ describe('SubscriptionByDurationPage', () => {
         isActive: true,
         packageId: 'pro_monthly',
         productId: 'pro_monthly',
+        offeringId: 'default',
         entitlements: ['pro'],
         period: 'monthly',
         expirationDate: new Date('2026-04-17'),

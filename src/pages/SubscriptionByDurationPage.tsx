@@ -178,7 +178,7 @@ export function SubscriptionByDurationPage({
     }
 
     const hasSubscription = subscription?.isActive && subscription.packageId;
-    const isCurrentPlan = subscription?.packageId === pkg.package.packageId;
+    const isCurrentPlan = subscription?.packageId === pkg.package.packageId && subscription?.offeringId === pkg.offerId;
 
     if (hasSubscription) {
       // All CTAs go to management URL when subscribed
@@ -288,7 +288,8 @@ export function SubscriptionByDurationPage({
         const isCurrentPlan =
           isLoggedIn &&
           subscription?.isActive &&
-          subscription.packageId === pkg.package.packageId;
+          subscription.packageId === pkg.package.packageId &&
+          subscription.offeringId === pkg.offerId;
         const cta = getPaidTileCta(pkg);
 
         return (

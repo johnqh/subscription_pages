@@ -405,6 +405,7 @@ describe('SubscriptionByOfferPage', () => {
         isActive: true,
         packageId: 'basic_monthly',
         productId: 'basic_monthly',
+        offeringId: 'basic',
         entitlements: ['basic'],
         period: 'monthly',
       },
