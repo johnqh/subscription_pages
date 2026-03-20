@@ -9,7 +9,7 @@
  *   followed by a list of duration options with savings and price CTAs.
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   SubscriptionPlatform,
   type SubscriptionPeriod,
@@ -181,6 +181,22 @@ export function SubscriptionByOfferPage({
 
   const [purchaseError, setPurchaseError] = useState<string | null>(null);
   const [isPurchasing, setIsPurchasing] = useState(false);
+
+  // Animate content when switching offerings
+  const contentRef = useRef<HTMLDivElement>(null);
+  const prevSegmentRef = useRef(selectedSegment);
+  useEffect(() => {
+    if (prevSegmentRef.current !== selectedSegment && contentRef.current) {
+      contentRef.current.animate?.(
+        [
+          { opacity: 0, transform: 'translateY(8px)' },
+          { opacity: 1, transform: 'translateY(0)' },
+        ],
+        { duration: 200, easing: 'ease-out' }
+      );
+      prevSegmentRef.current = selectedSegment;
+    }
+  }, [selectedSegment]);
 
   // Always call useOfferingPackages (hooks can't be conditional).
   const fallbackOfferId = offerings[0]?.offerId ?? '';
@@ -374,7 +390,7 @@ export function SubscriptionByOfferPage({
     >
       {/* Offering content + duration list for paid offerings */}
       {!isFreeSelected && (
-        <div className="col-span-full space-y-6">
+        <div ref={contentRef} className="col-span-full space-y-6">
           {/* Offering description area */}
           {renderOfferingContent && (
             <div className="rounded-xl bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 p-5">
