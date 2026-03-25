@@ -54,6 +54,11 @@ export interface SubscriptionByDurationPageProps {
   token?: string;
   /** Include sandbox purchases */
   testMode?: boolean;
+  /**
+   * Translation function for localizing labels.
+   * Falls back to the fallback string if not provided.
+   */
+  t?: (key: string, fallback: string) => string;
 }
 
 export function SubscriptionByDurationPage({
@@ -70,7 +75,10 @@ export function SubscriptionByDurationPage({
   baseUrl,
   token,
   testMode,
+  t: translate,
 }: SubscriptionByDurationPageProps) {
+  const loc = (key: string, fallback: string) =>
+    translate ? translate(key, fallback) : fallback;
   const {
     packagesByDuration,
     availableDurations,
@@ -104,8 +112,7 @@ export function SubscriptionByDurationPage({
   const [isPurchasing, setIsPurchasing] = useState(false);
 
   // Set default duration once available
-  const activeDuration =
-    selectedDuration ?? availableDurations[0] ?? null;
+  const activeDuration = selectedDuration ?? availableDurations[0] ?? null;
 
   const isLoading = isLoadingPackages || isLoadingSubscription;
   const error = packagesError || subscriptionError;
@@ -122,9 +129,7 @@ export function SubscriptionByDurationPage({
       });
       await refreshSubscription();
     } catch (err) {
-      setPurchaseError(
-        err instanceof Error ? err.message : 'Purchase failed'
-      );
+      setPurchaseError(err instanceof Error ? err.message : 'Purchase failed');
     } finally {
       setIsPurchasing(false);
     }
@@ -178,7 +183,9 @@ export function SubscriptionByDurationPage({
     }
 
     const hasSubscription = subscription?.isActive && subscription.packageId;
-    const isCurrentPlan = subscription?.packageId === pkg.package.packageId && subscription?.offeringId === pkg.offerId;
+    const isCurrentPlan =
+      subscription?.packageId === pkg.package.packageId &&
+      subscription?.offeringId === pkg.offerId;
 
     if (hasSubscription) {
       // All CTAs go to management URL when subscribed
@@ -196,11 +203,7 @@ export function SubscriptionByDurationPage({
 
   if (isLoading) {
     return (
-      <SubscriptionLayout
-        title={title}
-        className={className}
-        variant="cta"
-      >
+      <SubscriptionLayout title={title} className={className} variant='cta'>
         <p>Loading subscription plans...</p>
       </SubscriptionLayout>
     );
@@ -209,11 +212,7 @@ export function SubscriptionByDurationPage({
   // Cross-platform: show info instead of purchase UI
   if (!isPlatformMatch && backendSub.data) {
     return (
-      <SubscriptionLayout
-        title={title}
-        className={className}
-        variant="cta"
-      >
+      <SubscriptionLayout title={title} className={className} variant='cta'>
         <CrossPlatformSubscriptionInfo
           backendSubscription={backendSub.data}
           managementUrl={subscription?.managementUrl}
@@ -223,68 +222,89 @@ export function SubscriptionByDurationPage({
     );
   }
 
-  const displayError =
-    purchaseError ?? (error ? error.message : null);
+  const displayError = purchaseError ?? (error ? error.message : null);
 
   const currentStatusConfig =
     isLoggedIn && subscription?.isActive && subscription.packageId
       ? {
           isActive: true as const,
           activeContent: {
-            title: 'Active Subscription',
+            title: loc('active_subscription', 'Active Subscription'),
             fields: [
-              ...(subscription.productId
-                ? [{ label: 'Plan', value: subscription.productId }]
+              ...(subscription.packageId
+                ? [
+                    {
+                      label: loc('plan', 'Plan'),
+                      value: loc(
+                        subscription.packageId,
+                        subscription.packageId
+                      ),
+                    },
+                  ]
                 : []),
               ...(subscription.expirationDate
                 ? [
                     {
-                      label: 'Expires',
-                      value: subscription.expirationDate.toLocaleDateString(),
+                      label: loc('expires', 'Expires'),
+                      value: subscription.expirationDate.toLocaleDateString(
+                        undefined,
+                        { dateStyle: 'long' }
+                      ),
                     },
                   ]
                 : []),
               ...(subscription.willRenew !== undefined
                 ? [
                     {
-                      label: 'Auto-Renew',
-                      value: subscription.willRenew ? 'Yes' : 'No',
+                      label: loc('auto_renew', 'Auto-Renew'),
+                      value: subscription.willRenew
+                        ? loc('yes', 'Yes')
+                        : loc('no', 'No'),
                     },
                   ]
                 : []),
             ],
+            ...(subscription.platform
+              ? {
+                  platform: {
+                    label: loc(
+                      'subscription_platform',
+                      'Subscription Platform'
+                    ),
+                    value: subscription.platform,
+                  },
+                }
+              : {}),
           },
         }
       : undefined;
 
   const currentPackages = activeDuration
-    ? packagesByDuration[activeDuration] ?? []
+    ? (packagesByDuration[activeDuration] ?? [])
     : [];
 
   return (
     <SubscriptionLayout
       title={title}
       className={className}
-      variant="cta"
+      variant='cta'
       error={displayError}
       currentStatus={currentStatusConfig}
       freeTileConfig={getFreeTileConfig()}
       aboveProducts={
         availableDurations.length > 1 ? (
           <SegmentedControl
-            options={availableDurations.map((d) => ({
+            options={availableDurations.map(d => ({
               value: d,
               label: d.charAt(0).toUpperCase() + d.slice(1),
             }))}
             value={activeDuration ?? availableDurations[0]}
-            onChange={(value) =>
-              setSelectedDuration(value as SubscriptionPeriod)
-            }
+            onChange={value => setSelectedDuration(value as SubscriptionPeriod)}
           />
         ) : undefined
       }
     >
-      {currentPackages.map((pkg) => {
+      {currentPackages.map(pkg => {
         const isCurrentPlan =
           isLoggedIn &&
           subscription?.isActive &&
@@ -299,13 +319,9 @@ export function SubscriptionByDurationPage({
             title={pkg.package.name}
             price={pkg.package.product?.priceString ?? '$0'}
             periodLabel={
-              pkg.package.product
-                ? `/${pkg.package.product.period}`
-                : undefined
+              pkg.package.product ? `/${pkg.package.product.period}` : undefined
             }
-            features={
-              featuresByPackage?.[pkg.package.packageId] ?? []
-            }
+            features={featuresByPackage?.[pkg.package.packageId] ?? []}
             isSelected={false}
             onSelect={() => {}}
             isCurrentPlan={isCurrentPlan}

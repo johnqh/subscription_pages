@@ -224,9 +224,7 @@ export function SubscriptionByOfferPage({
       });
       await refreshSubscription();
     } catch (err) {
-      setPurchaseError(
-        err instanceof Error ? err.message : 'Purchase failed'
-      );
+      setPurchaseError(err instanceof Error ? err.message : 'Purchase failed');
     } finally {
       setIsPurchasing(false);
     }
@@ -235,7 +233,7 @@ export function SubscriptionByOfferPage({
   // Build segment options: Free + each offering (localized labels)
   const segmentOptions = [
     { value: 'free', label: loc('free', 'Free') },
-    ...offerings.map((o) => ({
+    ...offerings.map(o => ({
       value: o.offerId,
       label: loc(o.offerId, capitalize(o.offerId)),
     })),
@@ -287,7 +285,9 @@ export function SubscriptionByOfferPage({
     if (!isLoggedIn) return 'Log in to Continue';
     const hasSubscription = subscription?.isActive && subscription.packageId;
     if (hasSubscription) {
-      const isCurrentPlan = subscription?.packageId === pkg.packageId && subscription?.offeringId === selectedSegment;
+      const isCurrentPlan =
+        subscription?.packageId === pkg.packageId &&
+        subscription?.offeringId === selectedSegment;
       return isCurrentPlan ? 'Manage Subscription' : 'Change Subscription';
     }
     return 'Subscribe';
@@ -305,11 +305,7 @@ export function SubscriptionByOfferPage({
 
   if (isLoading) {
     return (
-      <SubscriptionLayout
-        title={title}
-        className={className}
-        variant="cta"
-      >
+      <SubscriptionLayout title={title} className={className} variant='cta'>
         <p>Loading subscription plans...</p>
       </SubscriptionLayout>
     );
@@ -318,11 +314,7 @@ export function SubscriptionByOfferPage({
   // Cross-platform: show info instead of purchase UI
   if (!isPlatformMatch && backendSub.data) {
     return (
-      <SubscriptionLayout
-        title={title}
-        className={className}
-        variant="cta"
-      >
+      <SubscriptionLayout title={title} className={className} variant='cta'>
         <CrossPlatformSubscriptionInfo
           backendSubscription={backendSub.data}
           managementUrl={subscription?.managementUrl}
@@ -332,36 +324,59 @@ export function SubscriptionByOfferPage({
     );
   }
 
-  const displayError =
-    purchaseError ?? (error ? error.message : null);
+  const displayError = purchaseError ?? (error ? error.message : null);
 
   const currentStatusConfig =
     isLoggedIn && subscription?.isActive && subscription.packageId
       ? {
           isActive: true as const,
           activeContent: {
-            title: 'Active Subscription',
+            title: loc('active_subscription', 'Active Subscription'),
             fields: [
-              ...(subscription.productId
-                ? [{ label: 'Plan', value: subscription.productId }]
+              ...(subscription.packageId
+                ? [
+                    {
+                      label: loc('plan', 'Plan'),
+                      value: loc(
+                        subscription.packageId,
+                        subscription.packageId
+                      ),
+                    },
+                  ]
                 : []),
               ...(subscription.expirationDate
                 ? [
                     {
-                      label: 'Expires',
-                      value: subscription.expirationDate.toLocaleDateString(),
+                      label: loc('expires', 'Expires'),
+                      value: subscription.expirationDate.toLocaleDateString(
+                        undefined,
+                        { dateStyle: 'long' }
+                      ),
                     },
                   ]
                 : []),
               ...(subscription.willRenew !== undefined
                 ? [
                     {
-                      label: 'Auto-Renew',
-                      value: subscription.willRenew ? 'Yes' : 'No',
+                      label: loc('auto_renew', 'Auto-Renew'),
+                      value: subscription.willRenew
+                        ? loc('yes', 'Yes')
+                        : loc('no', 'No'),
                     },
                   ]
                 : []),
             ],
+            ...(subscription.platform
+              ? {
+                  platform: {
+                    label: loc(
+                      'subscription_platform',
+                      'Subscription Platform'
+                    ),
+                    value: subscription.platform,
+                  },
+                }
+              : {}),
           },
         }
       : undefined;
@@ -372,13 +387,13 @@ export function SubscriptionByOfferPage({
     <SubscriptionLayout
       title={title}
       className={className}
-      variant="cta"
+      variant='cta'
       error={displayError}
       currentStatus={currentStatusConfig}
       freeTileConfig={isFreeSelected ? getFreeTileConfig() : undefined}
       aboveProducts={
         segmentOptions.length > 1 ? (
-          <div className="flex justify-center mb-6">
+          <div className='flex justify-center mb-6'>
             <SegmentedControl
               options={segmentOptions}
               value={selectedSegment}
@@ -390,17 +405,17 @@ export function SubscriptionByOfferPage({
     >
       {/* Offering content + duration list for paid offerings */}
       {!isFreeSelected && (
-        <div ref={contentRef} className="col-span-full space-y-6">
+        <div ref={contentRef} className='col-span-full space-y-6'>
           {/* Offering description area */}
           {renderOfferingContent && (
-            <div className="rounded-xl bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 p-5">
+            <div className='rounded-xl bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 p-5'>
               {renderOfferingContent(selectedSegment)}
             </div>
           )}
 
           {/* Duration options list */}
-          <div className="space-y-3">
-            {packages.map((pkg) => {
+          <div className='space-y-3'>
+            {packages.map(pkg => {
               const period = pkg.product?.period;
               const periodLabel = period
                 ? loc(period, PERIOD_LABELS[period] ?? capitalize(period))
@@ -429,19 +444,19 @@ export function SubscriptionByOfferPage({
                   }
                 >
                   {/* Left: duration title + package id + savings subtitle */}
-                  <div className="min-w-0 flex-1">
-                    <p className="text-base font-semibold text-gray-900 dark:text-gray-100">
+                  <div className='min-w-0 flex-1'>
+                    <p className='text-base font-semibold text-gray-900 dark:text-gray-100'>
                       {periodLabel}
                     </p>
-                    <p className="text-xs text-gray-400 dark:text-gray-500">
+                    <p className='text-xs text-gray-400 dark:text-gray-500'>
                       {pkg.packageId}
                     </p>
                     {savings !== null ? (
-                      <p className="text-sm font-medium text-green-600 dark:text-green-400">
+                      <p className='text-sm font-medium text-green-600 dark:text-green-400'>
                         Save {savings}%
                       </p>
                     ) : isCurrentPlan ? (
-                      <p className="text-sm font-medium text-blue-600 dark:text-blue-400">
+                      <p className='text-sm font-medium text-blue-600 dark:text-blue-400'>
                         Current Plan
                       </p>
                     ) : null}
@@ -451,7 +466,7 @@ export function SubscriptionByOfferPage({
                   <button
                     onClick={ctaAction}
                     disabled={isPurchasing || !ctaAction}
-                    className="ml-4 flex-shrink-0 rounded-lg px-4 py-2 text-sm font-semibold transition-colors bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className='ml-4 flex-shrink-0 rounded-lg px-4 py-2 text-sm font-semibold transition-colors bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed'
                   >
                     {`${priceStr} · ${ctaLabel}`}
                   </button>
