@@ -231,13 +231,13 @@ export function SubscriptionByDurationPage({
           activeContent: {
             title: loc('active_subscription', 'Active Subscription'),
             fields: [
-              ...(subscription.packageId
+              ...(subscription.productId
                 ? [
                     {
                       label: loc('plan', 'Plan'),
                       value: loc(
-                        subscription.packageId,
-                        subscription.packageId
+                        subscription.productId,
+                        subscription.productId
                       ),
                     },
                   ]
