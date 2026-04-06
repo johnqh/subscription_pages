@@ -293,14 +293,16 @@ export function SubscriptionByDurationPage({
       freeTileConfig={getFreeTileConfig()}
       aboveProducts={
         availableDurations.length > 1 ? (
-          <SegmentedControl
-            options={availableDurations.map(d => ({
-              value: d,
-              label: d.charAt(0).toUpperCase() + d.slice(1),
-            }))}
-            value={activeDuration ?? availableDurations[0]}
-            onChange={value => setSelectedDuration(value as SubscriptionPeriod)}
-          />
+          <div className="flex justify-center mb-6">
+            <SegmentedControl
+              options={availableDurations.map(d => ({
+                value: d,
+                label: d.charAt(0).toUpperCase() + d.slice(1),
+              }))}
+              value={activeDuration ?? availableDurations[0]}
+              onChange={value => setSelectedDuration(value as SubscriptionPeriod)}
+            />
+          </div>
         ) : undefined
       }
     >

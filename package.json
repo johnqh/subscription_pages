@@ -1,6 +1,6 @@
 {
   "name": "@sudobility/subscription_pages",
-  "version": "0.0.21",
+  "version": "0.0.22",
   "description": "Subscription page components for React web applications",
   "type": "module",
   "main": "dist/index.js",
