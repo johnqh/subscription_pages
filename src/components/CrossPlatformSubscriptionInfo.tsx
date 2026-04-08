@@ -1,4 +1,5 @@
 import type { SubscriptionPlatform, BackendSubscriptionResult } from '@sudobility/types';
+import { colors } from '@sudobility/design';
 
 const PLATFORM_NAMES: Record<string, string> = {
   web: 'Web',
@@ -23,7 +24,7 @@ export function CrossPlatformSubscriptionInfo({
     : 'another platform';
 
   return (
-    <div className="col-span-full rounded-xl border border-amber-200 dark:border-amber-700 bg-amber-50 dark:bg-amber-900/20 p-6 text-center space-y-4">
+    <div className={`col-span-full rounded-xl border p-6 text-center space-y-4 ${colors.component.card.attention.base} ${colors.component.card.attention.dark}`}>
       <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
         Subscription Active
       </h3>
@@ -47,7 +48,7 @@ export function CrossPlatformSubscriptionInfo({
         )}
       </div>
 
-      <p className="text-sm text-amber-800 dark:text-amber-300">
+      <p className={`text-sm ${colors.component.card.attention.text}`}>
         Your subscription was purchased on{' '}
         <span className="font-semibold">{platformName}</span>. To manage your
         subscription, please visit your {platformName} settings.
@@ -58,7 +59,7 @@ export function CrossPlatformSubscriptionInfo({
           href={managementUrl}
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-block rounded-lg px-5 py-2.5 text-sm font-semibold bg-blue-600 text-white hover:bg-blue-700 transition-colors"
+          className={`inline-block rounded-lg px-5 py-2.5 text-sm font-semibold transition-colors ${colors.component.button.primary.base} ${colors.component.button.primary.dark}`}
         >
           Manage Subscription
         </a>

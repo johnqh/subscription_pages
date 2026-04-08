@@ -15,6 +15,7 @@ import {
   type SubscriptionPeriod,
 } from '@sudobility/types';
 import type { NetworkClient } from '@sudobility/types';
+import { colors, ui } from '@sudobility/design';
 import {
   useAllOfferings,
   useOfferingPackages,
@@ -408,7 +409,7 @@ export function SubscriptionByOfferPage({
         <div ref={contentRef} className='col-span-full space-y-6'>
           {/* Offering description area */}
           {renderOfferingContent && (
-            <div className='rounded-xl bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 p-5'>
+            <div className={`rounded-xl border p-5 ${colors.component.card.default.base} ${colors.component.card.default.dark}`}>
               {renderOfferingContent(selectedSegment)}
             </div>
           )}
@@ -439,8 +440,8 @@ export function SubscriptionByOfferPage({
                   className={
                     'flex items-center justify-between rounded-xl p-4 transition-all ' +
                     (isCurrentPlan
-                      ? 'bg-blue-50 dark:bg-blue-900/20 border-2 border-blue-500 dark:border-blue-400'
-                      : 'bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700')
+                      ? `border-2 ${colors.component.alert.info.base} ${colors.component.alert.info.dark}`
+                      : `border ${colors.component.card.default.base} ${colors.component.card.default.dark}`)
                   }
                 >
                   {/* Left: duration title + package id + savings subtitle */}
@@ -452,11 +453,11 @@ export function SubscriptionByOfferPage({
                       {pkg.packageId}
                     </p>
                     {savings !== null ? (
-                      <p className='text-sm font-medium text-green-600 dark:text-green-400'>
+                      <p className={`text-sm ${ui.text.success}`}>
                         Save {savings}%
                       </p>
                     ) : isCurrentPlan ? (
-                      <p className='text-sm font-medium text-blue-600 dark:text-blue-400'>
+                      <p className={`text-sm ${ui.text.info}`}>
                         Current Plan
                       </p>
                     ) : null}
@@ -466,7 +467,7 @@ export function SubscriptionByOfferPage({
                   <button
                     onClick={ctaAction}
                     disabled={isPurchasing || !ctaAction}
-                    className='ml-4 flex-shrink-0 rounded-lg px-4 py-2 text-sm font-semibold transition-colors bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed'
+                    className={`ml-4 flex-shrink-0 rounded-lg px-4 py-2 text-sm font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${colors.component.button.primary.base} ${colors.component.button.primary.dark}`}
                   >
                     {`${priceStr} · ${ctaLabel}`}
                   </button>
