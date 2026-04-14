@@ -16,10 +16,7 @@ vi.mock('@sudobility/subscription-components', () => ({
   SegmentedControl: vi.fn(),
 }));
 
-import {
-  SubscriptionByDurationPage,
-  SubscriptionByOfferPage,
-} from './index';
+import { SubscriptionByDurationPage, SubscriptionByOfferPage } from './index';
 
 describe('pages/index exports', () => {
   it('exports SubscriptionByDurationPage', () => {

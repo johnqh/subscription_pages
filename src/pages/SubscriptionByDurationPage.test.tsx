@@ -31,11 +31,11 @@ const MockSubscriptionLayout = vi.fn(
     freeTileConfig,
     currentStatus,
   }: any) => (
-    <div data-testid="subscription-layout">
+    <div data-testid='subscription-layout'>
       <h1>{title}</h1>
-      {error && <div data-testid="error">{error}</div>}
+      {error && <div data-testid='error'>{error}</div>}
       {currentStatus?.isActive && (
-        <div data-testid="current-status">
+        <div data-testid='current-status'>
           {currentStatus.activeContent?.title}
           {currentStatus.activeContent?.fields?.map(
             (f: { label: string; value: string }) => (
@@ -46,11 +46,9 @@ const MockSubscriptionLayout = vi.fn(
           )}
         </div>
       )}
-      {aboveProducts && (
-        <div data-testid="above-products">{aboveProducts}</div>
-      )}
+      {aboveProducts && <div data-testid='above-products'>{aboveProducts}</div>}
       {freeTileConfig && (
-        <div data-testid="free-tile">
+        <div data-testid='free-tile'>
           <span>{freeTileConfig.title}</span>
           {freeTileConfig.ctaButton && (
             <button onClick={freeTileConfig.ctaButton.onClick}>
@@ -58,7 +56,7 @@ const MockSubscriptionLayout = vi.fn(
             </button>
           )}
           {freeTileConfig.topBadge && (
-            <span data-testid="free-badge">{freeTileConfig.topBadge.text}</span>
+            <span data-testid='free-badge'>{freeTileConfig.topBadge.text}</span>
           )}
         </div>
       )}
@@ -71,7 +69,7 @@ const MockSubscriptionTile = vi.fn(
   ({ id, title, ctaButton, isCurrentPlan, disabled }: any) => (
     <div data-testid={`tile-${id}`}>
       <span>{title}</span>
-      {isCurrentPlan && <span data-testid="current-plan-badge">Current</span>}
+      {isCurrentPlan && <span data-testid='current-plan-badge'>Current</span>}
       {ctaButton && (
         <button
           onClick={ctaButton.onClick}
@@ -85,22 +83,20 @@ const MockSubscriptionTile = vi.fn(
   )
 );
 
-const MockSegmentedControl = vi.fn(
-  ({ options, value, onChange }: any) => (
-    <div data-testid="segmented-control">
-      {options.map((opt: { value: string; label: string }) => (
-        <button
-          key={opt.value}
-          data-testid={`segment-${opt.value}`}
-          data-selected={opt.value === value}
-          onClick={() => onChange(opt.value)}
-        >
-          {opt.label}
-        </button>
-      ))}
-    </div>
-  )
-);
+const MockSegmentedControl = vi.fn(({ options, value, onChange }: any) => (
+  <div data-testid='segmented-control'>
+    {options.map((opt: { value: string; label: string }) => (
+      <button
+        key={opt.value}
+        data-testid={`segment-${opt.value}`}
+        data-selected={opt.value === value}
+        onClick={() => onChange(opt.value)}
+      >
+        {opt.label}
+      </button>
+    ))}
+  </div>
+));
 
 vi.mock('@sudobility/subscription-components', () => ({
   SubscriptionLayout: (props: any) => MockSubscriptionLayout(props),
@@ -252,7 +248,7 @@ describe('SubscriptionByDurationPage', () => {
       <SubscriptionByDurationPage
         isLoggedIn={true}
         onNavigateToLogin={() => {}}
-        userId="user-1"
+        userId='user-1'
       />
     );
 
@@ -294,7 +290,7 @@ describe('SubscriptionByDurationPage', () => {
       <SubscriptionByDurationPage
         isLoggedIn={true}
         onNavigateToLogin={() => {}}
-        userId="user-1"
+        userId='user-1'
       />
     );
 
@@ -337,7 +333,7 @@ describe('SubscriptionByDurationPage', () => {
       <SubscriptionByDurationPage
         isLoggedIn={true}
         onNavigateToLogin={() => {}}
-        userId="user-1"
+        userId='user-1'
       />
     );
 
@@ -374,8 +370,8 @@ describe('SubscriptionByDurationPage', () => {
       <SubscriptionByDurationPage
         isLoggedIn={true}
         onNavigateToLogin={() => {}}
-        userId="user-1"
-        userEmail="test@test.com"
+        userId='user-1'
+        userEmail='test@test.com'
       />
     );
 
@@ -420,7 +416,7 @@ describe('SubscriptionByDurationPage', () => {
       <SubscriptionByDurationPage
         isLoggedIn={true}
         onNavigateToLogin={() => {}}
-        userId="user-1"
+        userId='user-1'
       />
     );
 
@@ -538,7 +534,7 @@ describe('SubscriptionByDurationPage', () => {
       <SubscriptionByDurationPage
         isLoggedIn={false}
         onNavigateToLogin={() => {}}
-        title="Pricing Plans"
+        title='Pricing Plans'
       />
     );
 

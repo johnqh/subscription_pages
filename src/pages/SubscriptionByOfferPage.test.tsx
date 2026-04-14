@@ -42,19 +42,17 @@ const MockSubscriptionLayout = vi.fn(
     freeTileConfig,
     currentStatus,
   }: any) => (
-    <div data-testid="subscription-layout">
+    <div data-testid='subscription-layout'>
       <h1>{title}</h1>
-      {error && <div data-testid="error">{error}</div>}
+      {error && <div data-testid='error'>{error}</div>}
       {currentStatus?.isActive && (
-        <div data-testid="current-status">
+        <div data-testid='current-status'>
           {currentStatus.activeContent?.title}
         </div>
       )}
-      {aboveProducts && (
-        <div data-testid="above-products">{aboveProducts}</div>
-      )}
+      {aboveProducts && <div data-testid='above-products'>{aboveProducts}</div>}
       {freeTileConfig && (
-        <div data-testid="free-tile">
+        <div data-testid='free-tile'>
           <span>{freeTileConfig.title}</span>
           {freeTileConfig.ctaButton && (
             <button onClick={freeTileConfig.ctaButton.onClick}>
@@ -62,7 +60,7 @@ const MockSubscriptionLayout = vi.fn(
             </button>
           )}
           {freeTileConfig.topBadge && (
-            <span data-testid="free-badge">{freeTileConfig.topBadge.text}</span>
+            <span data-testid='free-badge'>{freeTileConfig.topBadge.text}</span>
           )}
         </div>
       )}
@@ -71,22 +69,20 @@ const MockSubscriptionLayout = vi.fn(
   )
 );
 
-const MockSegmentedControl = vi.fn(
-  ({ options, value, onChange }: any) => (
-    <div data-testid="segmented-control">
-      {options.map((opt: { value: string; label: string }) => (
-        <button
-          key={opt.value}
-          data-testid={`segment-${opt.value}`}
-          data-selected={opt.value === value}
-          onClick={() => onChange(opt.value)}
-        >
-          {opt.label}
-        </button>
-      ))}
-    </div>
-  )
-);
+const MockSegmentedControl = vi.fn(({ options, value, onChange }: any) => (
+  <div data-testid='segmented-control'>
+    {options.map((opt: { value: string; label: string }) => (
+      <button
+        key={opt.value}
+        data-testid={`segment-${opt.value}`}
+        data-selected={opt.value === value}
+        onClick={() => onChange(opt.value)}
+      >
+        {opt.label}
+      </button>
+    ))}
+  </div>
+));
 
 vi.mock('@sudobility/subscription-components', () => ({
   SubscriptionLayout: (props: any) => MockSubscriptionLayout(props),
@@ -251,7 +247,7 @@ describe('SubscriptionByOfferPage', () => {
       <SubscriptionByOfferPage
         isLoggedIn={true}
         onNavigateToLogin={() => {}}
-        userId="user-1"
+        userId='user-1'
       />
     );
 
@@ -342,7 +338,7 @@ describe('SubscriptionByOfferPage', () => {
       <SubscriptionByOfferPage
         isLoggedIn={true}
         onNavigateToLogin={() => {}}
-        userId="user-1"
+        userId='user-1'
       />
     );
 
@@ -381,7 +377,7 @@ describe('SubscriptionByOfferPage', () => {
       <SubscriptionByOfferPage
         isLoggedIn={true}
         onNavigateToLogin={() => {}}
-        userId="user-1"
+        userId='user-1'
       />
     );
 
@@ -417,7 +413,7 @@ describe('SubscriptionByOfferPage', () => {
       <SubscriptionByOfferPage
         isLoggedIn={true}
         onNavigateToLogin={() => {}}
-        userId="user-1"
+        userId='user-1'
       />
     );
 
@@ -425,7 +421,9 @@ describe('SubscriptionByOfferPage', () => {
     fireEvent.click(screen.getByTestId('segment-basic'));
 
     // Current plan shows "Current Plan" as both subtitle and button label
-    expect(screen.getAllByText('Current Plan').length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText('Current Plan').length).toBeGreaterThanOrEqual(
+      1
+    );
   });
 
   it('handles purchase flow', async () => {
@@ -454,8 +452,8 @@ describe('SubscriptionByOfferPage', () => {
       <SubscriptionByOfferPage
         isLoggedIn={true}
         onNavigateToLogin={() => {}}
-        userId="user-1"
-        userEmail="test@test.com"
+        userId='user-1'
+        userEmail='test@test.com'
       />
     );
 
@@ -499,7 +497,7 @@ describe('SubscriptionByOfferPage', () => {
       <SubscriptionByOfferPage
         isLoggedIn={true}
         onNavigateToLogin={() => {}}
-        userId="user-1"
+        userId='user-1'
       />
     );
 
@@ -534,7 +532,7 @@ describe('SubscriptionByOfferPage', () => {
       <SubscriptionByOfferPage
         isLoggedIn={false}
         onNavigateToLogin={() => {}}
-        title="Select a Plan"
+        title='Select a Plan'
       />
     );
 
@@ -568,7 +566,7 @@ describe('SubscriptionByOfferPage', () => {
       <SubscriptionByOfferPage
         isLoggedIn={true}
         onNavigateToLogin={() => {}}
-        userId="user-1"
+        userId='user-1'
       />
     );
 
@@ -599,8 +597,8 @@ describe('SubscriptionByOfferPage', () => {
       <SubscriptionByOfferPage
         isLoggedIn={false}
         onNavigateToLogin={() => {}}
-        renderOfferingContent={(offerId) => (
-          <p data-testid="offering-content">Features for {offerId}</p>
+        renderOfferingContent={offerId => (
+          <p data-testid='offering-content'>Features for {offerId}</p>
         )}
       />
     );
@@ -665,7 +663,7 @@ describe('SubscriptionByOfferPage', () => {
       <SubscriptionByOfferPage
         isLoggedIn={true}
         onNavigateToLogin={() => {}}
-        userId="user-1"
+        userId='user-1'
       />
     );
 

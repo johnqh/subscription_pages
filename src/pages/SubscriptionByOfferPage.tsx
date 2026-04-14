@@ -409,7 +409,9 @@ export function SubscriptionByOfferPage({
         <div ref={contentRef} className='col-span-full space-y-6'>
           {/* Offering description area */}
           {renderOfferingContent && (
-            <div className={`rounded-xl border p-5 ${colors.component.card.default.base} ${colors.component.card.default.dark}`}>
+            <div
+              className={`rounded-xl border p-5 ${colors.component.card.default.base} ${colors.component.card.default.dark}`}
+            >
               {renderOfferingContent(selectedSegment)}
             </div>
           )}
@@ -457,9 +459,7 @@ export function SubscriptionByOfferPage({
                         Save {savings}%
                       </p>
                     ) : isCurrentPlan ? (
-                      <p className={`text-sm ${ui.text.info}`}>
-                        Current Plan
-                      </p>
+                      <p className={`text-sm ${ui.text.info}`}>Current Plan</p>
                     ) : null}
                   </div>
 
