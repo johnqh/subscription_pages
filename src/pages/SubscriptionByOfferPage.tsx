@@ -36,8 +36,8 @@ import { CrossPlatformSubscriptionInfo } from '../components/CrossPlatformSubscr
 export interface SubscriptionByOfferPageProps {
   /** Whether the user is logged in */
   isLoggedIn: boolean;
-  /** Callback when user needs to navigate to login */
-  onNavigateToLogin: () => void;
+  /** Callback when user needs to navigate to login. offerId and packageId are passed when a specific package CTA is clicked. */
+  onNavigateToLogin: (offerId?: string, packageId?: string) => void;
   /** User ID for subscription lookup */
   userId?: string;
   /** User email for subscription operations */
@@ -295,7 +295,7 @@ export function SubscriptionByOfferPage({
   };
 
   const getCtaAction = (pkg: SubscriptionPackage, _offerId: string) => {
-    if (!isLoggedIn) return onNavigateToLogin;
+    if (!isLoggedIn) return () => onNavigateToLogin(_offerId, pkg.packageId);
     const hasSubscription = subscription?.isActive && subscription.packageId;
     if (hasSubscription) {
       // All CTAs go to management URL when subscribed

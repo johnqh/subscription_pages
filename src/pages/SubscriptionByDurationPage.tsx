@@ -30,8 +30,8 @@ import { CrossPlatformSubscriptionInfo } from '../components/CrossPlatformSubscr
 export interface SubscriptionByDurationPageProps {
   /** Whether the user is logged in */
   isLoggedIn: boolean;
-  /** Callback when user needs to navigate to login */
-  onNavigateToLogin: () => void;
+  /** Callback when user needs to navigate to login. offerId and packageId are passed when a specific package CTA is clicked. */
+  onNavigateToLogin: (offerId?: string, packageId?: string) => void;
   /** User ID for subscription lookup (undefined if not logged in) */
   userId?: string;
   /** User email for subscription operations */
@@ -178,7 +178,7 @@ export function SubscriptionByDurationPage({
     if (!isLoggedIn) {
       return {
         label: 'Log in to Continue',
-        onClick: onNavigateToLogin,
+        onClick: () => onNavigateToLogin(pkg.offerId, pkg.package.packageId),
       };
     }
 
