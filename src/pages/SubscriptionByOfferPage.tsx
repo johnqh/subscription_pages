@@ -250,7 +250,7 @@ export function SubscriptionByOfferPage({
         price: '$0',
         features: freeFeatures ?? [],
         ctaButton: {
-          label: 'Try it for Free',
+          label: loc('try_for_free', 'Try it for Free'),
           onClick: onNavigateToLogin,
         },
       };
@@ -264,7 +264,7 @@ export function SubscriptionByOfferPage({
         title: loc('free', 'Free'),
         price: '$0',
         features: freeFeatures ?? [],
-        topBadge: { text: 'Current', color: 'blue' },
+        topBadge: { text: loc('current', 'Current'), color: 'blue' },
       };
     }
 
@@ -283,15 +283,17 @@ export function SubscriptionByOfferPage({
   };
 
   const getCtaLabel = (pkg: SubscriptionPackage): string => {
-    if (!isLoggedIn) return 'Log in to Continue';
+    if (!isLoggedIn) return loc('login_to_continue', 'Log in to Continue');
     const hasSubscription = subscription?.isActive && subscription.packageId;
     if (hasSubscription) {
       const isCurrentPlan =
         subscription?.packageId === pkg.packageId &&
         subscription?.offeringId === selectedSegment;
-      return isCurrentPlan ? 'Manage Subscription' : 'Change Subscription';
+      return isCurrentPlan
+        ? loc('manage_subscription', 'Manage Subscription')
+        : loc('change_subscription', 'Change Subscription');
     }
-    return 'Subscribe';
+    return loc('subscribe', 'Subscribe');
   };
 
   const getCtaAction = (pkg: SubscriptionPackage, _offerId: string) => {
@@ -307,7 +309,7 @@ export function SubscriptionByOfferPage({
   if (isLoading) {
     return (
       <SubscriptionLayout title={title} className={className} variant='cta'>
-        <p>Loading subscription plans...</p>
+        <p>{loc('loading_plans', 'Loading subscription plans...')}</p>
       </SubscriptionLayout>
     );
   }
@@ -446,20 +448,22 @@ export function SubscriptionByOfferPage({
                       : `border ${colors.component.card.default.base} ${colors.component.card.default.dark}`)
                   }
                 >
-                  {/* Left: duration title + package id + savings subtitle */}
+                  {/* Left: duration title + savings subtitle */}
                   <div className='min-w-0 flex-1'>
                     <p className='text-base font-semibold text-gray-900 dark:text-gray-100'>
                       {periodLabel}
                     </p>
-                    <p className='text-xs text-gray-400 dark:text-gray-500'>
-                      {pkg.packageId}
-                    </p>
                     {savings !== null ? (
                       <p className={`text-sm ${ui.text.success}`}>
-                        Save {savings}%
+                        {loc('save_percent', `Save ${savings}%`).replace(
+                          '{{percent}}',
+                          String(savings)
+                        )}
                       </p>
                     ) : isCurrentPlan ? (
-                      <p className={`text-sm ${ui.text.info}`}>Current Plan</p>
+                      <p className={`text-sm ${ui.text.info}`}>
+                        {loc('current_plan', 'Current Plan')}
+                      </p>
                     ) : null}
                   </div>
 
