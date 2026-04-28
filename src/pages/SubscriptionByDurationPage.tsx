@@ -38,6 +38,10 @@ export interface SubscriptionByDurationPageProps {
   userEmail?: string;
   /** Features list for each package, keyed by packageId */
   featuresByPackage?: Record<string, string[]>;
+  /** Callback to get features for a package by its packageId */
+  getFeaturesByPackageId?: (packageId: string) => string[];
+  /** Callback to get features for a package by its entitlement */
+  getFeaturesByEntitlement?: (entitlement: string) => string[];
   /** Features for the free tier */
   freeFeatures?: string[];
   /** Custom title for the page */
@@ -67,6 +71,8 @@ export function SubscriptionByDurationPage({
   userId,
   userEmail,
   featuresByPackage,
+  getFeaturesByPackageId,
+  getFeaturesByEntitlement,
   freeFeatures,
   title = 'Choose Your Plan',
   className,
@@ -316,6 +322,29 @@ export function SubscriptionByDurationPage({
           subscription.offeringId === pkg.offerId;
         const cta = getPaidTileCta(pkg);
 
+        let features: string[] = [];
+        console.log(
+          '[SubscriptionByDurationPage] pkg:',
+          pkg.package.packageId,
+          'entitlements:',
+          pkg.package.entitlements,
+          'getFeaturesByEntitlement:',
+          !!getFeaturesByEntitlement,
+          'featuresByPackage:',
+          featuresByPackage
+        );
+        if (getFeaturesByPackageId) {
+          features = getFeaturesByPackageId(pkg.package.packageId);
+        } else if (getFeaturesByEntitlement && pkg.package.entitlements?.[0]) {
+          features = getFeaturesByEntitlement(pkg.package.entitlements[0]);
+        } else if (featuresByPackage) {
+          features = featuresByPackage[pkg.package.packageId] ?? [];
+        }
+        console.log(
+          '[SubscriptionByDurationPage] resolved features:',
+          features
+        );
+
         return (
           <SubscriptionTile
             key={`${pkg.offerId}-${pkg.package.packageId}`}
@@ -325,7 +354,7 @@ export function SubscriptionByDurationPage({
             periodLabel={
               pkg.package.product ? `/${pkg.package.product.period}` : undefined
             }
-            features={featuresByPackage?.[pkg.package.packageId] ?? []}
+            features={features}
             isSelected={false}
             onSelect={() => {}}
             isCurrentPlan={isCurrentPlan}

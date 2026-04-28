@@ -1,6 +1,6 @@
 {
   "name": "@sudobility/subscription_pages",
-  "version": "0.0.29",
+  "version": "0.0.31",
   "description": "Subscription page components for React web applications",
   "type": "module",
   "main": "dist/index.js",
@@ -64,5 +64,8 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/johnqh/subscription_pages.git"
+  },
+  "dependencies": {
+    "@sudobility/subscription_pages": "^0.0.29"
   }
 }
