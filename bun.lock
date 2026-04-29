@@ -5,12 +5,12 @@
     "": {
       "name": "@sudobility/subscription_pages",
       "dependencies": {
-        "@sudobility/subscription_pages": "^0.0.31",
+        "@sudobility/subscription_pages": "^0.0.33",
       },
       "devDependencies": {
         "@sudobility/design": "^1.1.29",
         "@sudobility/subscription-components": "^1.0.31",
-        "@sudobility/subscription_lib": "^0.0.40",
+        "@sudobility/subscription_lib": "^0.0.41",
         "@sudobility/types": "^1.9.61",
         "@tanstack/react-query": "^5.91.2",
         "@testing-library/jest-dom": "^6.0.0",
@@ -34,7 +34,7 @@
       "peerDependencies": {
         "@sudobility/design": "^1.1.29",
         "@sudobility/subscription-components": "^1.0.31",
-        "@sudobility/subscription_lib": "^0.0.40",
+        "@sudobility/subscription_lib": "^0.0.41",
         "@sudobility/types": "^1.9.61",
         "react": "^18.0.0 || ^19.0.0",
         "react-dom": "^18.0.0 || ^19.0.0",
@@ -340,9 +340,9 @@
 
     "@sudobility/subscription-components": ["@sudobility/subscription-components@1.0.31", "", { "optionalDependencies": { "@rollup/rollup-linux-x64-gnu": "4.52.5", "@rollup/rollup-linux-x64-musl": "4.52.5" }, "peerDependencies": { "@heroicons/react": "^2.2.0", "@revenuecat/purchases-js": "^1.0.0", "@sudobility/components": "^5.0.7", "@sudobility/design": "^1.1.18", "react": "^18.0.0 || ^19.0.0", "react-dom": "^18.0.0 || ^19.0.0" }, "optionalPeers": ["@revenuecat/purchases-js"] }, "sha512-zYy5doepoOumZy4c0q6+SfJNf8KZ6RAS+JfpjYZ/Ia/Bi9+E+cERL4CnGlQfupZ9ycp8yZsxg905Ex3IYppF1A=="],
 
-    "@sudobility/subscription_lib": ["@sudobility/subscription_lib@0.0.40", "", { "peerDependencies": { "@revenuecat/purchases-js": "^1.0.0", "@sudobility/types": "^1.9.61", "@tanstack/react-query": "^5.0.0", "react": "^18.0.0 || ^19.0.0", "react-native-purchases": ">=7.0.0" }, "optionalPeers": ["@revenuecat/purchases-js", "@tanstack/react-query", "react-native-purchases"] }, "sha512-Qe1F5UFrBrKZCAQyD87VtXZ4LZG7Zj1Wff4oWL6OGTpRQSZ13txx4ZIY92+gVMpOitl3YDU2vl/A14AYn9NL5w=="],
+    "@sudobility/subscription_lib": ["@sudobility/subscription_lib@0.0.41", "", { "peerDependencies": { "@revenuecat/purchases-js": "^1.0.0", "@sudobility/types": "^1.9.61", "@tanstack/react-query": "^5.0.0", "react": "^18.0.0 || ^19.0.0", "react-native-purchases": ">=7.0.0" }, "optionalPeers": ["@revenuecat/purchases-js", "@tanstack/react-query", "react-native-purchases"] }, "sha512-jJtLRzugbENrRQmd0BJ1Jo30oudd5XjrVSGm+mk+FetApkfxjpB3E4Wz4QmLTlYedBzqClpc5AqA/HKTQqS9Qg=="],
 
-    "@sudobility/subscription_pages": ["@sudobility/subscription_pages@0.0.31", "", { "dependencies": { "@sudobility/subscription_pages": "^0.0.29" }, "peerDependencies": { "@sudobility/design": "^1.1.29", "@sudobility/subscription-components": "^1.0.31", "@sudobility/subscription_lib": "^0.0.40", "@sudobility/types": "^1.9.61", "react": "^18.0.0 || ^19.0.0", "react-dom": "^18.0.0 || ^19.0.0" } }, "sha512-66zjwmQEBlBHxCA6KGpg+4QNQMVoikxdmjLHI9HHKkNMtipNrqmEAaJRAvEGXmemgPpZRK1khmZM7P4GBtFQPg=="],
+    "@sudobility/subscription_pages": ["@sudobility/subscription_pages@0.0.33", "", { "dependencies": { "@sudobility/subscription_pages": "^0.0.31" }, "peerDependencies": { "@sudobility/design": "^1.1.29", "@sudobility/subscription-components": "^1.0.31", "@sudobility/subscription_lib": "^0.0.40", "@sudobility/types": "^1.9.61", "react": "^18.0.0 || ^19.0.0", "react-dom": "^18.0.0 || ^19.0.0" } }, "sha512-DUPHihDqMEi8JH6JwqgbVdHTf+KHxpckxntigQBhOhVMFz9PZjMYpa3xRvgrYfK07fUmDbYXQ37yDI3iDlQL8A=="],
 
     "@sudobility/types": ["@sudobility/types@1.9.61", "", {}, "sha512-SODGpstB/iKfK3H/4BvJx/FBcc1h3gutUjGotyxN19VnOfWyzaDoEmW7eyoxOAYhZyXMXagSiii+NIEZvuxKog=="],
 
@@ -942,7 +942,7 @@
 
     "@rushstack/ts-command-line/argparse": ["argparse@1.0.10", "", { "dependencies": { "sprintf-js": "~1.0.2" } }, "sha512-o5Roy6tNG4SL/FOkCAN6RzjiakZS25RLYFrcMttJqbdd8BWrnA+fGz57iN5Pb06pvBGvl5gQ0B48dJlslXvoTg=="],
 
-    "@sudobility/subscription_pages/@sudobility/subscription_pages": ["@sudobility/subscription_pages@0.0.29", "", { "peerDependencies": { "@sudobility/design": "^1.1.29", "@sudobility/subscription-components": "^1.0.31", "@sudobility/subscription_lib": "^0.0.40", "@sudobility/types": "^1.9.61", "react": "^18.0.0 || ^19.0.0", "react-dom": "^18.0.0 || ^19.0.0" } }, "sha512-ZrvGOJSvOyUiau1/XC8gSHkn7IsY40NHv2H+SbfmtLyVL8kI1XjWhOA2x96rOO6aIwzPRtlLvSyXj7dxAcNA7g=="],
+    "@sudobility/subscription_pages/@sudobility/subscription_pages": ["@sudobility/subscription_pages@0.0.31", "", { "dependencies": { "@sudobility/subscription_pages": "^0.0.29" }, "peerDependencies": { "@sudobility/design": "^1.1.29", "@sudobility/subscription-components": "^1.0.31", "@sudobility/subscription_lib": "^0.0.40", "@sudobility/types": "^1.9.61", "react": "^18.0.0 || ^19.0.0", "react-dom": "^18.0.0 || ^19.0.0" } }, "sha512-66zjwmQEBlBHxCA6KGpg+4QNQMVoikxdmjLHI9HHKkNMtipNrqmEAaJRAvEGXmemgPpZRK1khmZM7P4GBtFQPg=="],
 
     "@testing-library/dom/aria-query": ["aria-query@5.3.0", "", { "dependencies": { "dequal": "^2.0.3" } }, "sha512-b0P0sZPKtyu8HkeRAfCq0IfURZK+SuwMjY1UXGBU27wpAiTwQAIlq56IbIO+ytk/JjS1fMR14ee5WBBfKi5J6A=="],
 
@@ -979,6 +979,8 @@
     "@microsoft/api-extractor/semver/lru-cache": ["lru-cache@6.0.0", "", { "dependencies": { "yallist": "^4.0.0" } }, "sha512-Jo6dJ04CmSjuznwJSS3pUeWmd/H0ffTlkXXgwZi+eq1UCmqQwCh+eLsYOYCwY991i2Fah4h1BEMCx4qThGbsiA=="],
 
     "@rushstack/node-core-library/semver/lru-cache": ["lru-cache@6.0.0", "", { "dependencies": { "yallist": "^4.0.0" } }, "sha512-Jo6dJ04CmSjuznwJSS3pUeWmd/H0ffTlkXXgwZi+eq1UCmqQwCh+eLsYOYCwY991i2Fah4h1BEMCx4qThGbsiA=="],
+
+    "@sudobility/subscription_pages/@sudobility/subscription_pages/@sudobility/subscription_pages": ["@sudobility/subscription_pages@0.0.29", "", { "peerDependencies": { "@sudobility/design": "^1.1.29", "@sudobility/subscription-components": "^1.0.31", "@sudobility/subscription_lib": "^0.0.40", "@sudobility/types": "^1.9.61", "react": "^18.0.0 || ^19.0.0", "react-dom": "^18.0.0 || ^19.0.0" } }, "sha512-ZrvGOJSvOyUiau1/XC8gSHkn7IsY40NHv2H+SbfmtLyVL8kI1XjWhOA2x96rOO6aIwzPRtlLvSyXj7dxAcNA7g=="],
 
     "@typescript-eslint/typescript-estree/minimatch/brace-expansion": ["brace-expansion@5.0.4", "", { "dependencies": { "balanced-match": "^4.0.2" } }, "sha512-h+DEnpVvxmfVefa4jFbCf5HdH5YMDXRsmKflpf1pILZWRFlTbJpxeU55nJl4Smt5HQaGzg1o6RHFPJaOqnmBDg=="],
 
