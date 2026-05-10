@@ -200,6 +200,7 @@ export function SubscriptionByOfferPage({
   }, [selectedSegment]);
 
   // Always call useOfferingPackages (hooks can't be conditional).
+  // Pass `offerings` to avoid a stale duplicate useAllOfferings instance.
   const fallbackOfferId = offerings[0]?.offerId ?? '';
   const activeOfferId =
     selectedSegment !== 'free' ? selectedSegment : fallbackOfferId;
@@ -207,7 +208,7 @@ export function SubscriptionByOfferPage({
     packages,
     isLoading: isLoadingPackages,
     error: packagesError,
-  } = useOfferingPackages(activeOfferId);
+  } = useOfferingPackages(activeOfferId, offerings);
 
   const isLoading =
     isLoadingOfferings || isLoadingSubscription || isLoadingPackages;
