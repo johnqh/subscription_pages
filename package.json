@@ -1,6 +1,6 @@
 {
   "name": "@sudobility/subscription_pages",
-  "version": "0.0.51",
+  "version": "0.0.52",
   "description": "Subscription page components for React web applications",
   "type": "module",
   "main": "dist/index.js",
@@ -31,10 +31,10 @@
     "@sudobility/subscription_lib": "^0.0.44",
     "@sudobility/subscription-components": "^1.0.31",
     "@sudobility/types": "^1.9.62",
-    "@sudobility/design": "^1.1.32"
+    "@sudobility/design": "^1.1.33"
   },
   "devDependencies": {
-    "@sudobility/design": "^1.1.32",
+    "@sudobility/design": "^1.1.33",
     "@sudobility/subscription-components": "^1.0.31",
     "@sudobility/subscription_lib": "^0.0.44",
     "@sudobility/types": "^1.9.62",
