@@ -30,11 +30,11 @@ export function CrossPlatformSubscriptionInfo({
     <div
       className={`col-span-full rounded-xl border p-6 text-center space-y-4 ${colors.component.card.attention.base} ${colors.component.card.attention.dark}`}
     >
-      <h3 className='text-lg font-semibold text-gray-900 dark:text-gray-100'>
+      <h3 className='text-lg font-semibold text-foreground'>
         Subscription Active
       </h3>
 
-      <div className='space-y-2 text-sm text-gray-700 dark:text-gray-300'>
+      <div className='space-y-2 text-sm text-foreground'>
         <p>
           Entitlements:{' '}
           <span className='font-medium'>

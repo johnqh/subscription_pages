@@ -451,7 +451,7 @@ export function SubscriptionByOfferPage({
                 >
                   {/* Left: duration title + savings subtitle */}
                   <div className='min-w-0 flex-1'>
-                    <p className='text-base font-semibold text-gray-900 dark:text-gray-100'>
+                    <p className='text-base font-semibold text-foreground'>
                       {periodLabel}
                     </p>
                     {savings !== null ? (
