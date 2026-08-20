@@ -1,5 +1,10 @@
 # Subscription Pages - AI Development Guide
 
+> **Git policy — never auto-commit or auto-push.** Leave your work in the working tree.
+> Run `git commit`, `git push`, `gh pr create`, or `scripts/push_all.sh` **only when the user
+> explicitly asks in that turn**. Approval for an earlier change does not carry forward, and
+> finishing a task is not permission to commit it.
+
 ## Overview
 
 Web page components for subscription management in React applications. Composes hooks from `@sudobility/subscription_lib` with UI components from `@sudobility/subscription-components` to provide ready-to-use subscription pages.
@@ -116,3 +121,7 @@ consuming apps (import pages directly)
 ```bash
 bun run type-check && bun run lint && bun test && bun run build
 ```
+
+## Git Workflow
+
+- Do not use feature branches for code changes. Always stay on the current branch.
