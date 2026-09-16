@@ -22,7 +22,7 @@
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "format": "prettier --write \"src/**/*.{ts,tsx,js,jsx,json,css,md}\"",
-    "test": "vitest run",
+    "test:unit": "vitest run",
     "test:watch": "vitest"
   },
   "peerDependencies": {
